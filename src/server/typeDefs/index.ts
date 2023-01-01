@@ -182,11 +182,11 @@ export const typeDefs = `#graphql
         userId: Int!
     }
 
-    type UserProfileToPets {
+    type UserProfileToPetDetails {
         userProfile: UserProfile
         userProfileId: Int
-        pet: Pet
-        petId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
     }
 
 
