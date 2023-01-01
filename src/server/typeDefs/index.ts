@@ -112,12 +112,26 @@ export const typeDefs = `#graphql
         pets: [ImageToPetDetails]
     }
 
+    type ImageToPetDetails {
+        petImage: PetImage
+        petImageId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
+    }
+
     type Breed {
         id: ID!
         createdAt: String
         updatedAt: String
 
         breed: String!
+    }
+
+    type BreedToPetDetails {
+        breed: Breed
+        breedId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
     }
 
     type Color {
@@ -130,32 +144,11 @@ export const typeDefs = `#graphql
         pets: [ColorToPetDetails]
     }
 
-    type BreedToPetDetails {
-        breed: Breed
-        breedId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
-    }
-
-    type ImageToPetDetails {
-        petImage: PetImage
-        petImageId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
-    }
-
     type ColorToPetDetails {
         color: Color
         colorId: Int
         petDetails: PetDetails
         getDetailsId: Int
-    }
-
-    type VolunteerProfileToPetDetails {
-        volunteerProfile: VolunteerProfile
-        volunteerProfileId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
     }
 
 
@@ -246,5 +239,12 @@ export const typeDefs = `#graphql
 
         volunteerProfile: VolunteerProfile!
         volunteerProfileId: Int!
+    }
+
+    type VolunteerProfileToPetDetails {
+        volunteerProfile: VolunteerProfile
+        volunteerProfileId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
     }
 `;
