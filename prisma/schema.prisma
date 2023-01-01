@@ -14,3 +14,7 @@ model Agency {
 
     name String
 }
+
+// when creating the favoriting pets model be sure to use this
+// to ensure unique id combination when creating prisma schema
+// @@id([userProfileId, petId])
