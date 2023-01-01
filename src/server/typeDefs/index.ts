@@ -12,14 +12,27 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        username: String!
         email: String!
         password: String!
         token: String
 
+        profile: AgencyProfile
+        pets: [Pet]!
+        volunteers: [Volunteer]!
+    }
+
+    type AgencyProfile {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        username: String
+        bio: String
         address: AgencyAddress
         contact: AgencyContact
-        pets: [Pet]!
+
+        agency: Agency!
+        agencyId: Int!
     }
 
     type AgencyAddress {
@@ -34,8 +47,8 @@ export const typeDefs = `#graphql
         zip: Int!
         country: String!
 
-        agency: Agency
-        agencyId: Int
+        agencyProfile: AgencyProfile!
+        agencyProfileId: Int!
     }
 
     type AgencyContact {
@@ -47,8 +60,8 @@ export const typeDefs = `#graphql
         email: String
         fax: String
 
-        agency: Agency
-        agencyId: Int
+        agencyProfile: AgencyProfile!
+        agencyProfileId: Int!
     }
 
 
@@ -73,12 +86,14 @@ export const typeDefs = `#graphql
         age: Int
         bio: String
         species: String
-        breed: String
+        breed: [BreedOnPetDetails]
         gender: String
         weight: Int
         
-        color: [ColorOnPetDetails]
-        images: [ImagesOnPetDetails]
+        color: [ColorOnPetDetails]!
+        images: [ImageOnPetDetails]!
+        favoritedBy: [FavoritesOnPets]!
+        volunteers: [VolunteerOnPetDetails]!
 
         pet: Pet!
         petId: Int!
@@ -93,7 +108,15 @@ export const typeDefs = `#graphql
         file: String
         thumbnail: String
 
-        pets: [ImagesOnPetDetails]
+        pets: [ImageOnPetDetails]
+    }
+
+    type Breed {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        breed: String!
     }
 
     type Color {
@@ -106,7 +129,14 @@ export const typeDefs = `#graphql
         pets: [ColorOnPetDetails]
     }
 
-    type ImagesOnPetDetails {
+    type BreedOnPetDetails {
+        breed: Breed
+        breedId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
+    }
+
+    type ImageOnPetDetails {
         petImage: PetImage
         petImageId: Int
         petDetails: PetDetails
@@ -118,5 +148,103 @@ export const typeDefs = `#graphql
         colorId: Int
         petDetails: PetDetails
         getDetailsId: Int
+    }
+
+    type VolunteerOnPetDetails {
+        volunteerProfile: VolunteerProfile
+        volunteerProfileId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
+    }
+
+
+
+
+    # ::: user :::
+    type User {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        username: String! 
+        email: String!
+        password: String!
+        token: String
+
+        profile: UserProfile
+    }
+
+    type UserProfile {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        firstName: String
+        lastName: String
+        bio: String
+        favorites: [FavoritesOnPets]!
+
+        user: User!
+        userId: Int!
+    }
+
+    type FavoritesOnPets {
+        userProfile: UserProfile
+        userProfileId: Int
+        pet: Pet
+        petId: Int
+    }
+
+
+
+
+    # ::: volunteer :::
+
+    type Volunteer {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        email: String!
+        password: String!
+        token: String
+
+        profile: VolunteerProfile
+
+        agency: Agency
+        agencyId: Int
+    }
+
+    type VolunteerProfile {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        firstName: String
+        lastName: String
+        bio: String
+        phone: String
+
+        address: VolunteerAddress
+        assignedPets: [VolunteerOnPetDetails]!
+
+        volunteer: Volunteer!
+        volunteerId: Int!
+    }
+
+    type VolunteerAddress {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        address: String!
+        apartment: String
+        city: String!
+        state: String!
+        zip: Int!
+        country: String!
+
+        volunteerProfile: VolunteerProfile!
+        volunteerProfileId: Int!
     }
 `;
