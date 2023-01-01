@@ -92,8 +92,8 @@ export const typeDefs = `#graphql
         isAvailable: Boolean!
         
         color: [ColorToPetDetails]!
-        images: [ImageToPetDetails]!
-        favoritedBy: [UserProfileToPets]!
+        images: [PetImageToPetDetails]!
+        favoritedBy: [UserProfileToPetDetails]!
         volunteers: [VolunteerProfileToPetDetails]!
 
         pet: Pet!
@@ -109,10 +109,10 @@ export const typeDefs = `#graphql
         file: String
         thumbnail: String
 
-        pets: [ImageToPetDetails]
+        pets: [PetImageToPetDetails]
     }
 
-    type ImageToPetDetails {
+    type PetImageToPetDetails {
         petImage: PetImage
         petImageId: Int
         petDetails: PetDetails
@@ -176,7 +176,7 @@ export const typeDefs = `#graphql
         firstName: String
         lastName: String
         bio: String
-        favorites: [UserProfileToPets]!
+        favorites: [UserProfileToPetDetails]!
 
         user: User!
         userId: Int!
