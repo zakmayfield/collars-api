@@ -13,7 +13,9 @@ export const typeDefs = `#graphql
         updatedAt: String
 
         username: String!
+        email: String!
         password: String!
+        token: String
 
         address: AgencyAddress
         contact: AgencyContact
@@ -67,7 +69,7 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        name: String
+        name: String!
         age: Int
         bio: String
         species: String
@@ -76,9 +78,22 @@ export const typeDefs = `#graphql
         weight: Int
         
         color: [ColorOnPetDetails]
+        images: [ImagesOnPetDetails]
 
         pet: Pet!
         petId: Int!
+    }
+
+    type PetImage {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        url: String
+        file: String
+        thumbnail: String
+
+        pets: [ImagesOnPetDetails]
     }
 
     type Color {
@@ -86,15 +101,22 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        color: String
+        color: String!
 
         pets: [ColorOnPetDetails]
+    }
+
+    type ImagesOnPetDetails {
+        petImage: PetImage
+        petImageId: Int
+        petDetails: PetDetails
+        petDetailsId: Int
     }
 
     type ColorOnPetDetails {
         color: Color
         colorId: Int
-        details: PetDetails
-        detailsId: Int
+        petDetails: PetDetails
+        getDetailsId: Int
     }
 `;
