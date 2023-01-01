@@ -89,10 +89,11 @@ export const typeDefs = `#graphql
         breed: [BreedToPetDetails]
         gender: String
         weight: Int
+        isAvailable: Boolean!
         
         color: [ColorToPetDetails]!
         images: [ImageToPetDetails]!
-        favoritedBy: [FavoritesToPets]!
+        favoritedBy: [UserProfileToPets]!
         volunteers: [VolunteerProfileToPetDetails]!
 
         pet: Pet!
@@ -182,13 +183,13 @@ export const typeDefs = `#graphql
         firstName: String
         lastName: String
         bio: String
-        favorites: [FavoritesToPets]!
+        favorites: [UserProfileToPets]!
 
         user: User!
         userId: Int!
     }
 
-    type FavoritesToPets {
+    type UserProfileToPets {
         userProfile: UserProfile
         userProfileId: Int
         pet: Pet
