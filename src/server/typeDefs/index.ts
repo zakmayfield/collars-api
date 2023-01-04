@@ -73,11 +73,11 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        details: PetDetails
+        profile: PetProfile
         agency: Agency!
     }
 
-    type PetDetails {
+    type PetProfile {
         id: ID!
         createdAt: String
         updatedAt: String
@@ -86,7 +86,7 @@ export const typeDefs = `#graphql
         age: Int
         bio: String
         species: String
-        breed: [BreedToPetDetails]
+        breed: [BreedToPetProfile]
         sex: String
         weight: Int
         birthday: String
@@ -95,10 +95,10 @@ export const typeDefs = `#graphql
         isHouseTrained: Boolean
         isAvailable: Boolean!
         
-        color: [ColorToPetDetails]!
-        images: [PetImageToPetDetails]!
-        favoritedBy: [UserProfileToPetDetails]!
-        volunteers: [VolunteerProfileToPetDetails]!
+        color: [ColorToPetProfile]!
+        images: [PetImageToPetProfile]!
+        favoritedBy: [UserProfileToPetProfile]!
+        volunteers: [VolunteerProfileToPetProfile]!
 
         pet: Pet!
         petId: Int!
@@ -113,8 +113,8 @@ export const typeDefs = `#graphql
         avoid: String
         personalityType: String
 
-        petDetails: PetDetails!
-        petDetailsId: Int!
+        petProfile: PetProfile!
+        petProfileId: Int!
     }
 
     type PetImage {
@@ -126,14 +126,14 @@ export const typeDefs = `#graphql
         file: String
         thumbnail: String
 
-        pets: [PetImageToPetDetails]
+        pets: [PetImageToPetProfile]
     }
 
-    type PetImageToPetDetails {
+    type PetImageToPetProfile {
         petImage: PetImage
         petImageId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
+        petProfile: PetProfile
+        petProfileId: Int
     }
 
     type Breed {
@@ -143,14 +143,14 @@ export const typeDefs = `#graphql
 
         name: String!
 
-        pets: [BreedToPetDetails]
+        pets: [BreedToPetProfile]
     }
 
-    type BreedToPetDetails {
+    type BreedToPetProfile {
         breed: Breed
         breedId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
+        petProfile: PetProfile
+        petProfileId: Int
     }
 
     type Color {
@@ -160,14 +160,14 @@ export const typeDefs = `#graphql
 
         color: String!
 
-        pets: [ColorToPetDetails]
+        pets: [ColorToPetProfile]
     }
 
-    type ColorToPetDetails {
+    type ColorToPetProfile {
         color: Color
         colorId: Int
-        petDetails: PetDetails
-        getDetailsId: Int
+        petProfile: PetProfile
+        petProfileId: Int
     }
 
 
@@ -195,18 +195,18 @@ export const typeDefs = `#graphql
         firstName: String
         lastName: String
         bio: String
-        favorites: [UserProfileToPetDetails]!
+        favorites: [UserProfileToPetProfile]!
 
         user: User!
         userId: Int!
     }
 
     # favorites
-    type UserProfileToPetDetails {
+    type UserProfileToPetProfile {
         userProfile: UserProfile
         userProfileId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
+        petProfile: PetProfile
+        petProfileId: Int
     }
 
 
@@ -239,17 +239,17 @@ export const typeDefs = `#graphql
         phone: String
 
         address: VolunteerAddress
-        assignedPets: [VolunteerProfileToPetDetails]!
+        assignedPets: [VolunteerProfileToPetProfile]!
 
         volunteer: Volunteer!
         volunteerId: Int!
     }
 
-    type VolunteerProfileToPetDetails {
+    type VolunteerProfileToPetProfile {
         volunteerProfile: VolunteerProfile
         volunteerProfileId: Int
-        petDetails: PetDetails
-        petDetailsId: Int
+        petProfile: PetProfile
+        petProfileId: Int
     }
     
     type VolunteerAddress {
