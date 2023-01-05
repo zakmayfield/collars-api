@@ -30,6 +30,25 @@ export const typeDefs = `#graphql
 
 
 
+    # ::: contact :::
+    type Contact {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        phone: String
+        email: String
+
+        agencyProfile: AgencyProfile
+        agencyProfileId: Int
+
+        volunteerProfile: VolunteerProfile
+        volunteerProfileId: Int
+    }
+
+
+
+
     # ::: agency :::
     type Agency {
         id: ID!
@@ -52,28 +71,16 @@ export const typeDefs = `#graphql
 
         username: String
         bio: String
-        # NOTE ::: could i change AgencyContact to a general Contact table and make another 1-1 similar to address
-        contact: AgencyContact
+        
 
+        contact: Contact
+        contactId: Int
 
         address: Address
         addressId: Int
 
         agency: Agency!
         agencyId: Int!
-    }
-
-    type AgencyContact {
-        id: ID!
-        createdAt: String
-        updatedAt: String
-
-        phone: String
-        email: String
-        fax: String
-
-        agencyProfile: AgencyProfile!
-        agencyProfileId: Int!
     }
 
 
@@ -248,12 +255,14 @@ export const typeDefs = `#graphql
         firstName: String
         lastName: String
         bio: String
-        phone: String
 
-        assignedPets: [VolunteerProfileToPetProfile]!
+        contact: Contact
+        contactId: Int
 
         address: Address
         addressId: Int
+
+        assignedPets: [VolunteerProfileToPetProfile]!
 
         volunteer: Volunteer!
         volunteerId: Int!
