@@ -59,7 +59,7 @@ export const typeDefs = `#graphql
         token: String
 
         profile: AgencyProfile
-        # pets: [Pet]!
+        pets: [Pet]!
         volunteers: [User]!
     }
 
@@ -138,8 +138,10 @@ export const typeDefs = `#graphql
         breed: [BreedsToPets]!
         savedBy: [UsersToPets]!
 
-        agency: Agency!
         profile: PetProfile
+        agency: Agency!
+
+        agencyId: Int!
     }
 
     type PetProfile {
@@ -155,11 +157,13 @@ export const typeDefs = `#graphql
         coat: String
         goodWith: String
         personalityType: String
+        dietRestrictions: String
         isHouseTrained: Boolean
         isAvailable: Boolean!
-        
-        colors: [ColorsToPetProfiles]!
+
+        color: [ColorsToPetProfiles]!
         images: [ImagesToPetProfiles]!
+        medical: Medical
 
         pet: Pet!
         petId: Int!
@@ -221,6 +225,8 @@ export const typeDefs = `#graphql
         url: String
         file: String
         thumbnail: String
+
+        pets: [ImagesToPetProfiles]
     }
 
     type ImagesToPetProfiles {
@@ -231,193 +237,74 @@ export const typeDefs = `#graphql
     }
 
 
-    # -----------------------------
-    # # ::: pet :::
-    # type Pet {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
 
-    #     agency: Agency!
-    #     profile: PetProfile
-    # }
 
-    # type PetProfile {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
+    # ::: medical :::
+    type Medical {
+        id: ID!
+        createdAt: String
+        updatedAt: String
 
-    #     name: String!
-    #     age: Int
-    #     bio: String
-    #     species: String
-    #     breed: [BreedToPetProfile]
-    #     sex: String
-    #     weight: Int
-    #     birthday: String
-    #     coat: String
-    #     behavior: Behavior
-    #     isHouseTrained: Boolean
-    #     isAvailable: Boolean!
-        
-    #     color: [ColorToPetProfile]!
-    #     images: [PetImageToPetProfile]!
-    #     favoritedBy: [UserProfileToPetProfile]!
-    #     volunteers: [VolunteerProfileToPetProfile]!
+        allergies: [AllergiesToMedicals]!
+        vaccines: [VaccinesToMedicals]!
+        medication: [MedicationsToMedicals]!
 
-    #     pet: Pet!
-    #     petId: Int!
-    # }
+        petProfile: PetProfile!
 
-    # type Behavior {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     goodWith: String
-    #     avoid: String
-    #     personalityType: String
-
-    #     petProfile: PetProfile!
-    #     petProfileId: Int!
-    # }
-
-    # type PetImage {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     url: String
-    #     file: String
-    #     thumbnail: String
-
-    #     pets: [PetImageToPetProfile]
-    # }
-
-    # type PetImageToPetProfile {
-    #     petImage: PetImage!
-    #     petImageId: Int!
-    #     petProfile: PetProfile!
-    #     petProfileId: Int!
-    # }
-
-    # type Breed {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     name: String!
-
-    #     pets: [BreedToPetProfile]
-    # }
-
-    # type BreedToPetProfile {
-    #     breed: Breed!
-    #     breedId: Int!
-    #     petProfile: PetProfile!
-    #     petProfileId: Int!
-    # }
-
-    # type Color {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     color: String!
-
-    #     pets: [ColorToPetProfile]
-    # }
-
-    # type ColorToPetProfile {
-    #     color: Color!
-    #     colorId: Int!
-    #     petProfile: PetProfile!
-    #     petProfileId: Int!
-    # }
+        petProfileId: Int!
+    }
 
 
 
 
-    # # ::: user :::
-    # type User {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
+    # ::: allergy :::
+    type Allergy {
+        id: ID!
+        name: String
 
-    #     username: String! 
-    #     email: String!
-    #     password: String!
-    #     token: String
+        medicals: [AllergiesToMedicals]
+    }
 
-    #     profile: UserProfile
-    # }
-
-    # type UserProfile {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     firstName: String
-    #     lastName: String
-    #     bio: String
-    #     favorites: [UserProfileToPetProfile]!
-
-    #     user: User!
-    #     userId: Int!
-    # }
-
-    # # favorites
-    # type UserProfileToPetProfile {
-    #     userProfile: UserProfile!
-    #     userProfileId: Int!
-    #     petProfile: PetProfile!
-    #     petProfileId: Int!
-    # }
+    type AllergiesToMedicals {
+        allergy: Allergy!
+        allergyId: Int!
+        medical: Medical!
+        medicalId: Int!
+    }
 
 
 
 
-    # # ::: volunteer :::
-    # type Volunteer {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
+    # ::: Vaccine :::
+    type Vaccine {
+        id: ID!
+        name: String
 
-    #     email: String!
-    #     password: String!
-    #     token: String
+        medicals: [VaccinesToMedicals]
+    }
 
-    #     profile: VolunteerProfile
+    type VaccinesToMedicals {
+        vaccine: Vaccine!
+        vaccineId: Int!
+        medical: Medical!
+        medicalId: Int!
+    }
 
-    #     agency: Agency
-    #     agencyId: Int
-    # }
 
-    # type VolunteerProfile {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
 
-    #     firstName: String
-    #     lastName: String
-    #     bio: String
 
-    #     contact: Contact
-    #     contactId: Int
+    # ::: medication :::
+    type Medication {
+        id: ID!
+        name: String
 
-    #     address: Address
-    #     addressId: Int
+        medicals: [MedicationsToMedicals]
+    }
 
-    #     assignedPets: [VolunteerProfileToPetProfile]!
-
-    #     volunteer: Volunteer!
-    #     volunteerId: Int!
-    # }
-
-    # type VolunteerProfileToPetProfile {
-    #     volunteerProfile: VolunteerProfile
-    #     volunteerProfileId: Int
-    #     petProfile: PetProfile
-    #     petProfileId: Int
-    # }
+    type MedicationsToMedicals {
+        medication: Vaccine!
+        medicationId: Int!
+        medical: Medical!
+        medicalId: Int!
+    }
 `;
