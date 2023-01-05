@@ -7,7 +7,10 @@ export const typeDefs = `#graphql
 
 
     # ::: address :::
-    type Address {
+    type Address { 
+
+        # in case of bugs, revert address back
+
         id: ID!
         createdAt: String
         updatedAt: String
@@ -19,27 +22,9 @@ export const typeDefs = `#graphql
         zip: Int!
         country: String!
         
-        agencyProfile: AgencyProfile?
-        volunteerProfile: VolunteerProfile?
-    }
-
-    # two join tables instead of two full address tables
-    # join address to agency and address to volunteer
-
-    type AgencyProfileToAddress {
-        profile: AgencyProfile!
-        agencyProfileId: Int!
-        # does this create too many .address chains?
-        address: Address
-        addressId: Int!
-    }
-    
-    type VolunteerProfileToAddress {
-        profile: VolunteerProfile!
-        volunteerProfileId: Int!
-        # does this create too many .address chains?
-        address: Address
-        addressId: Int!
+        # these properties will be created with Prisma, during the model creation - same goes for all other traits with this pattern of relation
+        agencyProfile: AgencyProfile
+        volunteerProfile: VolunteerProfile
     }
 
 
@@ -67,27 +52,15 @@ export const typeDefs = `#graphql
 
         username: String
         bio: String
-        address: AgencyProfileToAddress
+        # NOTE ::: could i change AgencyContact to a general Contact table and make another 1-1 similar to address
         contact: AgencyContact
+
+
+        address: Address
+        addressId: Int
 
         agency: Agency!
         agencyId: Int!
-    }
-
-    type AgencyAddress {
-        id: ID!
-        createdAt: String
-        updatedAt: String
-
-        address: String!
-        apartment: String
-        city: String!
-        state: String!
-        zip: Int!
-        country: String!
-
-        agencyProfile: AgencyProfile!
-        agencyProfileId: Int!
     }
 
     type AgencyContact {
@@ -277,8 +250,10 @@ export const typeDefs = `#graphql
         bio: String
         phone: String
 
-        address: VolunteerProfileToAddress
         assignedPets: [VolunteerProfileToPetProfile]!
+
+        address: Address
+        addressId: Int
 
         volunteer: Volunteer!
         volunteerId: Int!
@@ -290,24 +265,4 @@ export const typeDefs = `#graphql
         petProfile: PetProfile
         petProfileId: Int
     }
-    
-    # Leaving in in case of a bug check here
-
-    # type VolunteerAddress {
-    #     id: ID!
-    #     createdAt: String
-    #     updatedAt: String
-
-    #     address: String!
-    #     apartment: String
-    #     city: String!
-    #     state: String!
-    #     zip: Int!
-    #     country: String!
-
-    #     volunteerProfile: VolunteerProfile!
-    #     volunteerProfileId: Int!
-    # }
-
-    
 `;
