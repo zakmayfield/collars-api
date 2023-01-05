@@ -73,8 +73,8 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        profile: PetProfile
         agency: Agency!
+        profile: PetProfile
     }
 
     type PetProfile {
@@ -130,10 +130,10 @@ export const typeDefs = `#graphql
     }
 
     type PetImageToPetProfile {
-        petImage: PetImage
-        petImageId: Int
-        petProfile: PetProfile
-        petProfileId: Int
+        petImage: PetImage!
+        petImageId: Int!
+        petProfile: PetProfile!
+        petProfileId: Int!
     }
 
     type Breed {
@@ -147,10 +147,10 @@ export const typeDefs = `#graphql
     }
 
     type BreedToPetProfile {
-        breed: Breed
-        breedId: Int
-        petProfile: PetProfile
-        petProfileId: Int
+        breed: Breed!
+        breedId: Int!
+        petProfile: PetProfile!
+        petProfileId: Int!
     }
 
     type Color {
@@ -164,10 +164,10 @@ export const typeDefs = `#graphql
     }
 
     type ColorToPetProfile {
-        color: Color
-        colorId: Int
-        petProfile: PetProfile
-        petProfileId: Int
+        color: Color!
+        colorId: Int!
+        petProfile: PetProfile!
+        petProfileId: Int!
     }
 
 
@@ -203,10 +203,10 @@ export const typeDefs = `#graphql
 
     # favorites
     type UserProfileToPetProfile {
-        userProfile: UserProfile
-        userProfileId: Int
-        petProfile: PetProfile
-        petProfileId: Int
+        userProfile: UserProfile!
+        userProfileId: Int!
+        petProfile: PetProfile!
+        petProfileId: Int!
     }
 
 
