@@ -6,6 +6,45 @@ export const typeDefs = `#graphql
 
 
 
+    # ::: address :::
+    type Address {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        address: String!
+        apartment: String
+        city: String!
+        state: String!
+        zip: Int!
+        country: String!
+        
+        agencyProfile: AgencyProfile?
+        volunteerProfile: VolunteerProfile?
+    }
+
+    # two join tables instead of two full address tables
+    # join address to agency and address to volunteer
+
+    type AgencyProfileToAddress {
+        profile: AgencyProfile!
+        agencyProfileId: Int!
+        # does this create too many .address chains?
+        address: Address
+        addressId: Int!
+    }
+    
+    type VolunteerProfileToAddress {
+        profile: VolunteerProfile!
+        volunteerProfileId: Int!
+        # does this create too many .address chains?
+        address: Address
+        addressId: Int!
+    }
+
+
+
+
     # ::: agency :::
     type Agency {
         id: ID!
@@ -28,7 +67,7 @@ export const typeDefs = `#graphql
 
         username: String
         bio: String
-        address: AgencyAddress
+        address: AgencyProfileToAddress
         contact: AgencyContact
 
         agency: Agency!
@@ -238,7 +277,7 @@ export const typeDefs = `#graphql
         bio: String
         phone: String
 
-        address: VolunteerAddress
+        address: VolunteerProfileToAddress
         assignedPets: [VolunteerProfileToPetProfile]!
 
         volunteer: Volunteer!
@@ -252,21 +291,23 @@ export const typeDefs = `#graphql
         petProfileId: Int
     }
     
-    type VolunteerAddress {
-        id: ID!
-        createdAt: String
-        updatedAt: String
+    # Leaving in in case of a bug check here
 
-        address: String!
-        apartment: String
-        city: String!
-        state: String!
-        zip: Int!
-        country: String!
+    # type VolunteerAddress {
+    #     id: ID!
+    #     createdAt: String
+    #     updatedAt: String
 
-        volunteerProfile: VolunteerProfile!
-        volunteerProfileId: Int!
-    }
+    #     address: String!
+    #     apartment: String
+    #     city: String!
+    #     state: String!
+    #     zip: Int!
+    #     country: String!
+
+    #     volunteerProfile: VolunteerProfile!
+    #     volunteerProfileId: Int!
+    # }
 
     
 `;
