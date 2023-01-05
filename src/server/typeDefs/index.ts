@@ -8,9 +8,6 @@ export const typeDefs = `#graphql
 
     # ::: address :::
     type Address { 
-
-        # in case of bugs, revert address back
-
         id: ID!
         createdAt: String
         updatedAt: String
@@ -22,7 +19,6 @@ export const typeDefs = `#graphql
         zip: Int!
         country: String!
         
-        # these properties will be created with Prisma, during the model creation - same goes for all other traits with this pattern of relation
         agencyProfile: AgencyProfile
         volunteerProfile: VolunteerProfile
     }
