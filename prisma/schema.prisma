@@ -86,7 +86,7 @@ model User {
   savedPets UsersToPets[]
 
   agency   Agency? @relation(fields: [agencyId], references: [id])
-  agencyId Int
+  agencyId Int?
 }
 
 model UserProfile {
