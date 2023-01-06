@@ -178,7 +178,7 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        color: String
+        color: String!
 
         pets: [ColorsToPetProfiles]
     }
@@ -201,7 +201,7 @@ export const typeDefs = `#graphql
         updatedAt: String
        
 
-        breed: String
+        breed: String!
 
         pets: [BreedsToPets]
     }
@@ -245,66 +245,11 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        allergies: [AllergiesToMedicals]!
-        vaccines: [VaccinesToMedicals]!
-        medication: [MedicationsToMedicals]!
+        isVaccineCurrent: boolean
+        isFixed: boolean
 
         petProfile: PetProfile!
-
         petProfileId: Int!
     }
 
-
-
-
-    # ::: allergy :::
-    type Allergy {
-        id: ID!
-        name: String
-
-        medicals: [AllergiesToMedicals]
-    }
-
-    type AllergiesToMedicals {
-        allergy: Allergy!
-        allergyId: Int!
-        medical: Medical!
-        medicalId: Int!
-    }
-
-
-
-
-    # ::: Vaccine :::
-    type Vaccine {
-        id: ID!
-        name: String
-
-        medicals: [VaccinesToMedicals]
-    }
-
-    type VaccinesToMedicals {
-        vaccine: Vaccine!
-        vaccineId: Int!
-        medical: Medical!
-        medicalId: Int!
-    }
-
-
-
-
-    # ::: medication :::
-    type Medication {
-        id: ID!
-        name: String
-
-        medicals: [MedicationsToMedicals]
-    }
-
-    type MedicationsToMedicals {
-        medication: Vaccine!
-        medicationId: Int!
-        medical: Medical!
-        medicalId: Int!
-    }
 `;
