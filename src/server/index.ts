@@ -37,10 +37,9 @@ startStandaloneServer(server, {
 
     if (req.headers && req.headers.authorization) {
       token = req.headers.authorization.split(' ')[1] || '';
-      const { id, type } = await jwt.verify(token, config.APP_SECRET);
+      const { id, type, role } = await jwt.verify(token, config.APP_SECRET);
+      console.log('::: req :::', req.headers.authorization)
     }
-
-    console.log('::: token :::', agency ? agency : 'no agency');
 
     return { db, agency };
   },
