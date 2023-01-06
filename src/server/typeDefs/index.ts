@@ -54,6 +54,7 @@ export const typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
+        name: String!
         email: String!
         password: String!
         token: String

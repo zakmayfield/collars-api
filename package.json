@@ -9,6 +9,9 @@
     "compile": "tsc",
     "start": "npm run compile && node ./dist/server/index.js"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

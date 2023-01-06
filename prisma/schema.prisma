@@ -46,6 +46,7 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  name     String  @unique @db.VarChar(28)
   email    String  @unique @db.VarChar(75)
   password String  @db.VarChar(128)
   token    String? @db.VarChar(256)
@@ -120,7 +121,7 @@ model Pet {
   updatedAt DateTime @updatedAt
 
   name    String         @db.VarChar(50)
-  species String         @db.VarChar(100)
+  species SpeciesToPets[]
   breed   BreedsToPets[]
   savedBy UsersToPets[]
 
@@ -216,4 +217,23 @@ model BreedsToPets {
   petId   Int
 
   @@id([breedId, petId])
+}
+
+model Species {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  species String @unique
+
+  pets SpeciesToPets[]
+}
+
+model SpeciesToPets {
+  species   Species @relation(fields: [speciesId], references: [id])
+  speciesId Int
+  pet     Pet   @relation(fields: [petId], references: [id])
+  petId   Int
+
+  @@id([speciesId, petId])
 }
