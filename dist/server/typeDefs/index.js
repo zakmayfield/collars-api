@@ -4,6 +4,7 @@ exports.typeDefs = void 0;
 exports.typeDefs = `#graphql
     type Query {
         test: String!
+        getPets: [Pet!]!
     }
 
 
@@ -57,6 +58,7 @@ exports.typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
+        name: String!
         email: String!
         password: String!
         token: String
@@ -74,9 +76,8 @@ exports.typeDefs = `#graphql
         username: String!
         bio: String
         
-
-        contact: Contact
-        address: Address
+        contacts: [Contact]!
+        addresses: [Address]!
 
         agency: Agency!
         agencyId: Int!
@@ -166,7 +167,6 @@ exports.typeDefs = `#graphql
 
         color: [ColorsToPetProfiles]!
         images: [ImagesToPetProfiles]!
-        medical: Medical
 
         pet: Pet!
         petId: Int!
@@ -181,7 +181,7 @@ exports.typeDefs = `#graphql
         createdAt: String
         updatedAt: String
 
-        color: String
+        color: String!
 
         pets: [ColorsToPetProfiles]
     }
@@ -204,7 +204,7 @@ exports.typeDefs = `#graphql
         updatedAt: String
        
 
-        breed: String
+        breed: String!
 
         pets: [BreedsToPets]
     }
@@ -237,77 +237,5 @@ exports.typeDefs = `#graphql
         imageId: Int!
         petProfile: PetProfile!
         petProfileId: Int!
-    }
-
-
-
-
-    # ::: medical :::
-    type Medical {
-        id: ID!
-        createdAt: String
-        updatedAt: String
-
-        allergies: [AllergiesToMedicals]!
-        vaccines: [VaccinesToMedicals]!
-        medication: [MedicationsToMedicals]!
-
-        petProfile: PetProfile!
-
-        petProfileId: Int!
-    }
-
-
-
-
-    # ::: allergy :::
-    type Allergy {
-        id: ID!
-        name: String
-
-        medicals: [AllergiesToMedicals]
-    }
-
-    type AllergiesToMedicals {
-        allergy: Allergy!
-        allergyId: Int!
-        medical: Medical!
-        medicalId: Int!
-    }
-
-
-
-
-    # ::: Vaccine :::
-    type Vaccine {
-        id: ID!
-        name: String
-
-        medicals: [VaccinesToMedicals]
-    }
-
-    type VaccinesToMedicals {
-        vaccine: Vaccine!
-        vaccineId: Int!
-        medical: Medical!
-        medicalId: Int!
-    }
-
-
-
-
-    # ::: medication :::
-    type Medication {
-        id: ID!
-        name: String
-
-        medicals: [MedicationsToMedicals]
-    }
-
-    type MedicationsToMedicals {
-        medication: Vaccine!
-        medicationId: Int!
-        medical: Medical!
-        medicalId: Int!
     }
 `;
