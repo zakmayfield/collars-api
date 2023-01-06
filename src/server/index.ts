@@ -26,8 +26,12 @@ interface ContextReturn {
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
-  context: async ({ req }: { req: any }): Promise<ContextReturn> => {
+  context: async ({ req, res }: { req: any, res: any }): Promise<ContextReturn> => {
     const db = prisma;
+    const token = req.headers.authorization || ''
+
+    console.log('::: token :::', token ? token : 'no token')
+
     return { db };
   },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

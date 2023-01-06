@@ -6,6 +6,13 @@ export const typeDefs = `#graphql
 
     type Mutation {
         test: String!
+        registerAgency(input: RegisterAgency!): Agency!
+    }
+
+    input RegisterAgency {
+        name: String!
+        email: String!
+        password: String!
     }
 
 

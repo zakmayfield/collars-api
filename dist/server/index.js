@@ -27,13 +27,14 @@ const client_1 = require("@prisma/client");
 const server_1 = require("@apollo/server");
 const standalone_1 = require("@apollo/server/standalone");
 const Query_1 = require("./resolvers/Query");
-// import { Mutation } from './resolvers/Mutation';
+const Mutation_1 = require("./resolvers/Mutation");
 const typeDefs_1 = require("./typeDefs");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const prisma = new client_1.PrismaClient();
 const resolvers = {
     Query: Query_1.Query,
+    Mutation: Mutation_1.Mutation
 };
 const server = new server_1.ApolloServer({
     typeDefs: typeDefs_1.typeDefs,
@@ -41,8 +42,10 @@ const server = new server_1.ApolloServer({
 });
 (0, standalone_1.startStandaloneServer)(server, {
     listen: { port: 4000 },
-    context: async ({ req }) => {
+    context: async ({ req, res }) => {
         const db = prisma;
+        const token = req.headers.authorization || '';
+        console.log('::: token :::', token);
         return { db };
     },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

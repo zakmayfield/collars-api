@@ -7,6 +7,17 @@ exports.typeDefs = `#graphql
         getPets: [Pet!]!
     }
 
+    type Mutation {
+        test: String!
+        registerAgency(input: RegisterAgency!): Agency!
+    }
+
+    input RegisterAgency {
+        name: String!
+        email: String!
+        password: String!
+    }
+
 
 
 
@@ -138,9 +149,9 @@ exports.typeDefs = `#graphql
         updatedAt: String
 
         name: String!
-        species: String!
-        breed: [BreedsToPets]!
-        savedBy: [UsersToPets]!
+        species: [SpeciesToPets]
+        breed: [BreedsToPets]
+        savedBy: [UsersToPets]
 
         profile: PetProfile
         agency: Agency!
@@ -165,8 +176,8 @@ exports.typeDefs = `#graphql
         isHouseTrained: Boolean
         isAvailable: Boolean!
 
-        color: [ColorsToPetProfiles]!
-        images: [ImagesToPetProfiles]!
+        color: [ColorsToPetProfiles]
+        images: [ImagesToPetProfiles]
 
         pet: Pet!
         petId: Int!
@@ -180,6 +191,7 @@ exports.typeDefs = `#graphql
         id: ID!
         createdAt: String
         updatedAt: String
+       
 
         color: String!
 
@@ -191,6 +203,27 @@ exports.typeDefs = `#graphql
         colorId: Int!
         petProfile: PetProfile!
         petProfileId: Int!
+    }
+
+
+
+
+    # ::: species :::
+    type Species {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        species: String!
+
+        pets: [SpeciesToPets]
+    }
+
+    type SpeciesToPets {
+        species: Species!
+        speciesId: Int!
+        pet: Pet!
+        petId: Int!
     }
 
 
