@@ -163,7 +163,7 @@ export const typeDefs = `#graphql
 
         color: [ColorsToPetProfiles]!
         images: [ImagesToPetProfiles]!
-        medical: Medical
+        health: Health?
 
         pet: Pet!
         petId: Int!
@@ -235,21 +235,4 @@ export const typeDefs = `#graphql
         petProfile: PetProfile!
         petProfileId: Int!
     }
-
-
-
-
-    # ::: medical :::
-    type Medical {
-        id: ID!
-        createdAt: String
-        updatedAt: String
-
-        isVaccineCurrent: boolean
-        isFixed: boolean
-
-        petProfile: PetProfile!
-        petProfileId: Int!
-    }
-
 `;

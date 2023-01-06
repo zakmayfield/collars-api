@@ -136,20 +136,25 @@ model PetProfile {
   updatedAt DateTime @updatedAt
   
   age Int 
-  bio String
+  bio String @db.VarChar(250)
   sex String
   weight Int
-  birthday String
   coat String
+  birthday String
+
   goodWith String
   personalityType String
   isHouseTrained Boolean
+
   dietRestrictions String
+
+  isVaccineCurrent Boolean?
+  isFixed Boolean?
+
   isAvailable Boolean
   
   color ColorsToPetProfiles[]
   images ImagesToPetProfiles[]
-  medical Medical?
 
   pet   Pet @relation(fields: [petId], references: [id])
   petId Int @unique
@@ -212,16 +217,4 @@ model BreedsToPets {
   petId Int
 
   @@id([breedId, petId])
-}
-
-model Medical {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  isVaccineCurrent Boolean?
-  isFixed Boolean?
-
-  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
-  petProfileId Int @unique
 }
