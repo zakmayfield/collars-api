@@ -121,7 +121,7 @@ model Pet {
 
   name    String
   species String
-  // breed [BreedsToPets]
+  breed BreedsToPets[]
   savedBy UsersToPets[]
 
   profile PetProfile?
@@ -134,7 +134,84 @@ model PetProfile {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  
+
+  age Int 
+  bio String
+  sex String
+  weight Int
+  birthday String
+  coat String
+  goodWith String
+  personalityType String
+  dietRestrictions String
+  isHouseTrained Boolean
+  isAvailable Boolean
+  
+  color ColorsToPetProfiles[]
+  images ImagesToPetProfiles[]
+  // medical Medical?
 
   pet   Pet @relation(fields: [petId], references: [id])
   petId Int @unique
+}
+
+model Color {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  color String @unique
+
+  pets ColorsToPetProfiles[]
+}
+
+model ColorsToPetProfiles {
+  color Color @relation(fields: [colorId], references: [id])
+  colorId Int
+  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
+  petProfileId Int
+
+  @@id([colorId, petProfileId])
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  url String?
+  file String?
+  thumbnail String?
+
+  pets ImagesToPetProfiles[]
+}
+
+model ImagesToPetProfiles {
+  image Image @relation(fields: [imageId], references: [id])
+  imageId Int
+  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
+  petProfileId Int
+
+  @@id([imageId, petProfileId])
+}
+
+model Breed {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  breed String @unique
+
+  pets BreedsToPets[]
+}
+
+model BreedsToPets {
+  breed Breed @relation(fields: [breedId], references: [id])
+  breedId Int
+  pet Pet @relation(fields: [petId], references: [id])
+  petId Int
+
+  @@id([breedId, petId])
 }
