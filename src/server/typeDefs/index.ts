@@ -163,7 +163,6 @@ export const typeDefs = `#graphql
 
         color: [ColorsToPetProfiles]!
         images: [ImagesToPetProfiles]!
-        health: Health?
 
         pet: Pet!
         petId: Int!
