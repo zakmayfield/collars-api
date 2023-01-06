@@ -134,9 +134,7 @@ model PetProfile {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  
-
+ 
   age Int 
   bio String
   sex String
@@ -151,7 +149,7 @@ model PetProfile {
   
   color ColorsToPetProfiles[]
   images ImagesToPetProfiles[]
-  // medical Medical?
+  medical Medical?
 
   pet   Pet @relation(fields: [petId], references: [id])
   petId Int @unique
@@ -214,4 +212,74 @@ model BreedsToPets {
   petId Int
 
   @@id([breedId, petId])
+}
+
+model Medical {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  allergies AllergiesToMedicals[]
+  vaccines VaccinesToMedicals[]
+  medication MedicationsToMedicals[]
+
+  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
+  petProfileId Int @unique
+}
+
+model Allergy {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  medicals AllergiesToMedicals[]
+}
+
+model AllergiesToMedicals {
+  allergy Allergy @relation(fields: [allergyId], references: [id])
+  allergyId Int
+  medical Medical @relation(fields: [medicalId], references: [id])
+  medicalId Int
+
+  @@id([allergyId, medicalId])
+}
+
+model Vaccine {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  medicals VaccinesToMedicals[]
+}
+
+model VaccinesToMedicals {
+  vaccine Vaccine @relation(fields: [vaccineId], references: [id])
+  vaccineId Int
+  medical Medical @relation(fields: [medicalId], references: [id])
+  medicalId Int
+
+  @@id([vaccineId, medicalId])
+}
+
+model Medication {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  medicals MedicationsToMedicals[]
+}
+
+model MedicationsToMedicals {
+  medication Medication @relation(fields: [medicationId], references: [id])
+  medicationId Int
+  medical Medical @relation(fields: [medicalId], references: [id])
+  medicalId Int
+
+  @@id([medicationId, medicalId])
 }
