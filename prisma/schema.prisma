@@ -12,12 +12,12 @@ model Address {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  address   String
-  apartment String?
-  city      String
-  state     String
+  address   String @db.VarChar(100)
+  apartment String? @db.VarChar(25)
+  city      String @db.VarChar(50)
+  state     String @db.VarChar(50)
   zip       Int
-  country   String
+  country   String @db.VarChar(100)
 
   agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
   userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
@@ -31,8 +31,8 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  phone String
-  email String
+  phone String @db.VarChar(50)
+  email String @db.VarChar(75)
 
   agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
   userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
@@ -119,8 +119,8 @@ model Pet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name    String
-  species String
+  name    String @db.VarChar(50)
+  species String @db.VarChar(100)
   breed BreedsToPets[]
   savedBy UsersToPets[]
 
