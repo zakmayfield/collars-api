@@ -12,17 +12,17 @@ model Address {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  address   String @db.VarChar(100)
+  address   String  @db.VarChar(100)
   apartment String? @db.VarChar(25)
-  city      String @db.VarChar(50)
-  state     String @db.VarChar(50)
+  city      String  @db.VarChar(50)
+  state     String  @db.VarChar(50)
   zip       Int
-  country   String @db.VarChar(100)
+  country   String  @db.VarChar(100)
 
   agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
   userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
 
-  agencyProfileId Int? @unique
+  agencyProfileId Int?
   userProfileId   Int? @unique
 }
 
@@ -37,7 +37,7 @@ model Contact {
   agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
   userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
 
-  agencyProfileId Int? @unique
+  agencyProfileId Int?
   userProfileId   Int? @unique
 }
 
@@ -46,9 +46,9 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email    String @unique
-  password String
-  token    String
+  email    String  @unique @db.VarChar(75)
+  password String  @db.VarChar(128)
+  token    String? @db.VarChar(256)
 
   profile    AgencyProfile?
   pets       Pet[]
@@ -60,11 +60,11 @@ model AgencyProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username String @unique
-  bio      String
+  username String  @unique @db.VarChar(50)
+  bio      String? @db.VarChar(500)
 
-  contact Contact?
-  address Address?
+  addresses Address[]
+  contacts  Contact[]
 
   agency   Agency @relation(fields: [agencyId], references: [id])
   agencyId Int    @unique
@@ -75,11 +75,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username String  @unique
-  email    String  @unique
-  password String
-  role     String
-  token    String?
+  username String  @unique @db.VarChar(20)
+  email    String  @unique @db.VarChar(75)
+  password String  @db.VarChar(128)
+  role     String  @db.VarChar(25)
+  token    String? @db.VarChar(256)
 
   profile UserProfile?
 
@@ -94,9 +94,9 @@ model UserProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  firstName String
-  lastName  String
-  bio       String
+  firstName String? @db.VarChar(50)
+  lastName  String? @db.VarChar(50)
+  bio       String? @db.VarChar(250)
 
   contact Contact?
   address Address?
@@ -119,9 +119,9 @@ model Pet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name    String @db.VarChar(50)
-  species String @db.VarChar(100)
-  breed BreedsToPets[]
+  name    String         @db.VarChar(50)
+  species String         @db.VarChar(100)
+  breed   BreedsToPets[]
   savedBy UsersToPets[]
 
   profile PetProfile?
@@ -134,26 +134,26 @@ model PetProfile {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  age Int 
-  bio String @db.VarChar(250)
-  sex String
-  weight Int
-  coat String
-  birthday String
 
-  goodWith String
-  personalityType String
-  isHouseTrained Boolean
+  age      Int?
+  bio      String? @db.VarChar(250)
+  sex      String? @db.VarChar(50)
+  weight   Int?
+  coat     String? @db.VarChar(25)
+  birthday String? @db.VarChar(128)
 
-  dietRestrictions String
+  goodWith        String?  @db.VarChar(50)
+  personalityType String?  @db.VarChar(50)
+  isHouseTrained  Boolean?
+
+  dietRestrictions String?
 
   isVaccineCurrent Boolean?
-  isFixed Boolean?
+  isFixed          Boolean?
 
   isAvailable Boolean
-  
-  color ColorsToPetProfiles[]
+
+  color  ColorsToPetProfiles[]
   images ImagesToPetProfiles[]
 
   pet   Pet @relation(fields: [petId], references: [id])
@@ -171,9 +171,9 @@ model Color {
 }
 
 model ColorsToPetProfiles {
-  color Color @relation(fields: [colorId], references: [id])
-  colorId Int
-  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
+  color        Color      @relation(fields: [colorId], references: [id])
+  colorId      Int
+  petProfile   PetProfile @relation(fields: [petProfileId], references: [id])
   petProfileId Int
 
   @@id([colorId, petProfileId])
@@ -184,17 +184,17 @@ model Image {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  url String?
-  file String?
+  url       String?
+  file      String?
   thumbnail String?
 
   pets ImagesToPetProfiles[]
 }
 
 model ImagesToPetProfiles {
-  image Image @relation(fields: [imageId], references: [id])
-  imageId Int
-  petProfile PetProfile @relation(fields: [petProfileId], references: [id])
+  image        Image      @relation(fields: [imageId], references: [id])
+  imageId      Int
+  petProfile   PetProfile @relation(fields: [petProfileId], references: [id])
   petProfileId Int
 
   @@id([imageId, petProfileId])
@@ -211,10 +211,10 @@ model Breed {
 }
 
 model BreedsToPets {
-  breed Breed @relation(fields: [breedId], references: [id])
+  breed   Breed @relation(fields: [breedId], references: [id])
   breedId Int
-  pet Pet @relation(fields: [petId], references: [id])
-  petId Int
+  pet     Pet   @relation(fields: [petId], references: [id])
+  petId   Int
 
   @@id([breedId, petId])
 }

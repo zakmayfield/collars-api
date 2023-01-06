@@ -71,9 +71,8 @@ export const typeDefs = `#graphql
         username: String!
         bio: String
         
-
-        contact: Contact
-        address: Address
+        contacts: [Contact]!
+        addresses: [Address]!
 
         agency: Agency!
         agencyId: Int!
