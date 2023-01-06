@@ -7,14 +7,134 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Agency {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Address {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    name String
+  address   String
+  apartment String?
+  city      String
+  state     String
+  zip       Int
+  country   String
+
+  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
+  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
+
+  agencyProfileId Int? @unique
+  userProfileId   Int? @unique
 }
 
-// when creating the UserProfileToPetDetails model be sure to use this
-// to ensure unique id combination when creating prisma schema
-// @@id([userProfileId, petId])
+model Contact {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phone String
+  email String
+
+  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
+  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
+
+  agencyProfileId Int? @unique
+  userProfileId   Int? @unique
+}
+
+model Agency {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email    String @unique
+  password String
+  token    String
+
+  profile    AgencyProfile?
+  pets       Pet[]
+  volunteers User[]
+}
+
+model AgencyProfile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username String @unique
+  bio      String
+
+  contact Contact?
+  address Address?
+
+  agency   Agency @relation(fields: [agencyId], references: [id])
+  agencyId Int    @unique
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username String  @unique
+  email    String  @unique
+  password String
+  role     String
+  token    String?
+
+  profile UserProfile?
+
+  savedPets UsersToPets[]
+
+  agency   Agency? @relation(fields: [agencyId], references: [id])
+  agencyId Int
+}
+
+model UserProfile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName String
+  lastName  String
+  bio       String
+
+  contact Contact?
+  address Address?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}
+
+model UsersToPets {
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  pet    Pet  @relation(fields: [petId], references: [id])
+  petId  Int
+
+  @@id([userId, petId])
+}
+
+model Pet {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name    String
+  species String
+  // breed [BreedsToPets]
+  savedBy UsersToPets[]
+
+  profile PetProfile?
+
+  agency   Agency? @relation(fields: [agencyId], references: [id])
+  agencyId Int
+}
+
+model PetProfile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pet   Pet @relation(fields: [petId], references: [id])
+  petId Int @unique
+}
