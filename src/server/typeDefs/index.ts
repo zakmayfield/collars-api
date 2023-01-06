@@ -135,9 +135,9 @@ export const typeDefs = `#graphql
         updatedAt: String
 
         name: String!
-        species: String!
-        breed: [BreedsToPets]!
-        savedBy: [UsersToPets]!
+        species: [SpeciesToPets]
+        breed: [BreedsToPets]
+        savedBy: [UsersToPets]
 
         profile: PetProfile
         agency: Agency!
@@ -162,8 +162,8 @@ export const typeDefs = `#graphql
         isHouseTrained: Boolean
         isAvailable: Boolean!
 
-        color: [ColorsToPetProfiles]!
-        images: [ImagesToPetProfiles]!
+        color: [ColorsToPetProfiles]
+        images: [ImagesToPetProfiles]
 
         pet: Pet!
         petId: Int!
@@ -177,6 +177,7 @@ export const typeDefs = `#graphql
         id: ID!
         createdAt: String
         updatedAt: String
+       
 
         color: String!
 
@@ -188,6 +189,27 @@ export const typeDefs = `#graphql
         colorId: Int!
         petProfile: PetProfile!
         petProfileId: Int!
+    }
+
+
+
+
+    # ::: species :::
+    type Species {
+        id: ID!
+        createdAt: String
+        updatedAt: String
+
+        species: String!
+
+        pets: [SpeciesToPets]
+    }
+
+    type SpeciesToPets {
+        species: Species!
+        speciesId: Int!
+        pet: Pet!
+        petId: Int!
     }
 
 
