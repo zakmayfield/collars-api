@@ -147,7 +147,6 @@ model PetProfile {
   isHouseTrained  Boolean?
 
   dietRestrictions String?
-
   isVaccineCurrent Boolean?
   isFixed          Boolean?
 
