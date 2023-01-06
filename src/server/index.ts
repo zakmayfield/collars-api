@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { Query } from './resolvers/Query';
-// import { Mutation } from './resolvers/Mutation';
+import { Mutation } from './resolvers/Mutation';
 import { typeDefs } from './typeDefs';
 import * as dotenv from 'dotenv';
 
@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Query,
+  Mutation
 };
 
 const server = new ApolloServer({

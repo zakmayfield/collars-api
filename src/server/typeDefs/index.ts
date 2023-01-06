@@ -4,6 +4,10 @@ export const typeDefs = `#graphql
         getPets: [Pet!]!
     }
 
+    type Mutation {
+        test: String!
+    }
+
 
 
 
