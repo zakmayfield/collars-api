@@ -43,7 +43,7 @@ startStandaloneServer(server, {
     // apollo client is sending req.headers.test as well as .authorization
     // i can send the token along with the header apon logging in
     if (req.headers && req.headers.test) {
-      console.log('::: headers :::', req.headers)
+      console.log('::: headers :::', req.headers.test)
     }
 
     return { db, agency };
