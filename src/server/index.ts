@@ -38,7 +38,12 @@ startStandaloneServer(server, {
     if (req.headers && req.headers.authorization) {
       token = req.headers.authorization.split(' ')[1] || '';
       const { id, type, role } = await jwt.verify(token, config.APP_SECRET);
-      console.log('::: req :::', req.headers.authorization)
+    }
+
+    // apollo client is sending req.headers.test as well as .authorization
+    // i can send the token along with the header apon logging in
+    if (req.headers && req.headers.test) {
+      console.log('::: headers :::', req.headers)
     }
 
     return { db, agency };
