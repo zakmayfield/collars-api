@@ -1,3 +1,4 @@
+import { AgencyContext, UserContext } from './../types/index';
 import { PrismaClient } from '@prisma/client';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
@@ -24,8 +25,8 @@ const server = new ApolloServer({
 
 interface ContextReturn {
   db: PrismaClient;
-  agency?: any;
-  user?: any;
+  agency?: AgencyContext;
+  user?: UserContext;
 }
 
 startStandaloneServer(server, {
@@ -34,20 +35,15 @@ startStandaloneServer(server, {
     const db = prisma;
     let agency = {};
     let token;
+    let decoded;
 
     if (req.headers && req.headers.authorization) {
-      
-      // this token is taking on a " at the end of the string, somehow, so by the time the token gets to the jwt.verify method it's an invalid token
-      token = req.headers.authorization.split(' ')[1] || '';
-
-      console.log('there is a req auth', token)
-
-      const decoded = jwt.verify(token, config.APP_SECRET);
+      token = req.headers.authorization.split(' ')[1].split('"')[0] || '';
+      decoded = jwt.verify(token, config.APP_SECRET);
     }
 
-    console.log('req.headers.authorization :::', req.headers.authorization)
-    console.log('req.headers.test :::', req.headers.test)
+    console.log('decoded :::', decoded);
 
-    return { db, agency };
+    return { db, agency: decoded };
   },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

@@ -51,12 +51,12 @@ const server = new server_1.ApolloServer({
         const db = prisma;
         let agency = {};
         let token;
+        let decoded;
         if (req.headers && req.headers.authorization) {
-            token = req.headers.authorization.split(' ')[1] || '';
-            const { id, type, role } = await jsonwebtoken_1.default.verify(token, config_1.default.APP_SECRET);
+            token = req.headers.authorization.split(' ')[1].split('"')[0] || '';
+            decoded = jsonwebtoken_1.default.verify(token, config_1.default.APP_SECRET);
         }
-        console.log('req.headers.authorization :::', req.headers.authorization);
-        console.log('req.headers.test :::', req.headers.test);
-        return { db, agency };
+        console.log('decoded :::', decoded);
+        return { db, agency: decoded };
     },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));
