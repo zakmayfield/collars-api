@@ -23,5 +23,9 @@ exports.Query = {
             throw new Error(`Server Error`);
         }
         return pets;
+    },
+    getAgencies: async (_parent, _args, context) => {
+        const agencies = await context.db.agency.findMany({});
+        return agencies;
     }
 };

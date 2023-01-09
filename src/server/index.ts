@@ -36,15 +36,17 @@ startStandaloneServer(server, {
     let token;
 
     if (req.headers && req.headers.authorization) {
+      
+      // this token is taking on a " at the end of the string, somehow, so by the time the token gets to the jwt.verify method it's an invalid token
       token = req.headers.authorization.split(' ')[1] || '';
-      const { id, type, role } = await jwt.verify(token, config.APP_SECRET);
+
+      console.log('there is a req auth', token)
+
+      const decoded = jwt.verify(token, config.APP_SECRET);
     }
 
-    // apollo client is sending req.headers.test as well as .authorization
-    // i can send the token along with the header apon logging in
-    if (req.headers && req.headers.test) {
-      console.log('::: headers :::', req.headers.test)
-    }
+    console.log('req.headers.authorization :::', req.headers.authorization)
+    console.log('req.headers.test :::', req.headers.test)
 
     return { db, agency };
   },

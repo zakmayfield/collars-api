@@ -2,6 +2,7 @@ export const typeDefs = `#graphql
     type Query {
         test: String!
         getPets: [Pet!]!
+        getAgencies: [Agency!]!
     }
 
     type Mutation {
