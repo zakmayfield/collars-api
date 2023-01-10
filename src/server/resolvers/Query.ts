@@ -31,11 +31,15 @@ export const Query = {
 
   getAgencyById: async (_parent, _args, context) => {
     const { id, email, type, role } = context.agency
-    const agency = await context.db.agency.findUnique({
-        where: { id }
-    })
 
-    console.log('::: getAgencyById Query :::', context.agency)
+    const agency = await context.db.agency.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true
+        }
+    })
   
     return agency
 },

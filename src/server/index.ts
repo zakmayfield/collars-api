@@ -33,21 +33,24 @@ interface ContextReturn {
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req }: { req: any }): Promise<ContextReturn> => {
-    // variables
-    let token;
-    let decoded;
-    const agency = {};
+    let token: string;
+    let decoded: AgencyContext;
     const db = prisma;
 
     // check auth headers and decode token if available
     if (req.headers && req.headers.authorization) {
       token = req.headers.authorization.split(' ')[1].split('"')[0];
-      decoded = jwt.verify(token, config.APP_SECRET);
+      
+      const{ id, email} = jwt.verify(token, config.APP_SECRET);
 
-      // const { id, email, type, role } = decoded;
+      const agency = {
+        id,
+        email
+      }
+
       return {
         db,
-        agency: decoded,
+        agency
       };
     }
 

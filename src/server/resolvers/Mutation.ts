@@ -4,12 +4,10 @@ import bcrypt from 'bcrypt';
 
 const generateToken = (
   id: number,
-  email: string,
-  type: string,
-  role: string | null
+  email: string
 ) =>
   jwt.sign(
-    { id: id, email: email, type: type, role: role },
+    { id: id, email: email },
     config.APP_SECRET,
     {
       expiresIn: '2d',
@@ -49,7 +47,7 @@ export const Mutation = {
 
     const validAgency = {
       ...createdAgency,
-      token: generateToken(createdAgency.id, createdAgency.email, 'agency', null),
+      token: generateToken(createdAgency.id, createdAgency.email),
     };
 
     return validAgency;
@@ -70,11 +68,11 @@ export const Mutation = {
 
     if (!valid) throw new Error(`🚫 Invalid password`);
 
-    const validAgency = {
+    const authenticatedAgency = {
       ...agency,
-      token: generateToken(agency.id, agency.email, 'agency', null),
+      token: generateToken(agency.id, agency.email),
     };
 
-    return validAgency;
+    return authenticatedAgency;
   }
 };
