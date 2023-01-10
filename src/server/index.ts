@@ -36,18 +36,21 @@ startStandaloneServer(server, {
     // variables
     let token;
     let decoded;
-    const agency = {}
+    const agency = {};
     const db = prisma;
 
     // check auth headers and decode token if available
     if (req.headers && req.headers.authorization) {
       token = req.headers.authorization.split(' ')[1].split('"')[0];
-      console.log('token', token)
-      // decoded = jwt.verify(token, config.APP_SECRET);
+      decoded = jwt.verify(token, config.APP_SECRET);
 
       // const { id, email, type, role } = decoded;
+      return {
+        db,
+        agency: decoded,
+      };
+    }
 
-      return { db, agency: { id: 0, email: '', type: '', role: '', iat: 0, exp: 0} };
-    } 
+    throw new GraphQLError(`🚫 No auth ::: please provide token :::`)
   },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));
