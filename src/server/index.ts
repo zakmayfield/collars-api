@@ -34,7 +34,6 @@ startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req }: { req: any }): Promise<ContextReturn> => {
     let token: string;
-    let decoded: AgencyContext;
     const db = prisma;
 
     // check auth headers and decode token if available
@@ -43,7 +42,7 @@ startStandaloneServer(server, {
       
       const{ id, email} = jwt.verify(token, config.APP_SECRET);
 
-      const agency = {
+      const agency: AgencyContext = {
         id,
         email
       }
