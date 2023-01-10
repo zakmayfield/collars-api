@@ -1,8 +1,8 @@
 export const typeDefs = `#graphql
     type Query {
-        test: String!
         getPets: [Pet!]!
         getAgencies: [Agency!]!
+        getAgencyById(id: ID!): Agency!
     }
 
     type Mutation {

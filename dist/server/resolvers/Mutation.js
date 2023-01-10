@@ -11,7 +11,6 @@ const generateToken = (id, email, type, role) => jsonwebtoken_1.default.sign({ i
     expiresIn: '2d',
 });
 exports.Mutation = {
-    test: () => 'test',
     registerAgency: async (_parent, args, context) => {
         const { name, email, password } = args.input;
         const checkIfNameExists = await context.db.agency.findUnique({
@@ -57,5 +56,5 @@ exports.Mutation = {
             token: generateToken(agency.id, agency.email, 'agency', null),
         };
         return validAgency;
-    },
+    }
 };

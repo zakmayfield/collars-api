@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.typeDefs = void 0;
 exports.typeDefs = `#graphql
     type Query {
-        test: String!
         getPets: [Pet!]!
         getAgencies: [Agency!]!
+        getAgencyById(id: ID!): Agency!
     }
 
     type Mutation {

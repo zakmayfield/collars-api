@@ -22,9 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const server_1 = require("@apollo/server");
@@ -32,8 +29,6 @@ const standalone_1 = require("@apollo/server/standalone");
 const Query_1 = require("./resolvers/Query");
 const Mutation_1 = require("./resolvers/Mutation");
 const typeDefs_1 = require("./typeDefs");
-const config_1 = __importDefault(require("./config"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const prisma = new client_1.PrismaClient();
@@ -48,15 +43,18 @@ const server = new server_1.ApolloServer({
 (0, standalone_1.startStandaloneServer)(server, {
     listen: { port: 4000 },
     context: async ({ req }) => {
-        const db = prisma;
-        let agency = {};
+        // variables
         let token;
         let decoded;
+        const agency = {};
+        const db = prisma;
+        // check auth headers and decode token if available
         if (req.headers && req.headers.authorization) {
-            token = req.headers.authorization.split(' ')[1].split('"')[0] || '';
-            decoded = jsonwebtoken_1.default.verify(token, config_1.default.APP_SECRET);
+            token = req.headers.authorization.split(' ')[1].split('"')[0];
+            console.log('token', token);
+            // decoded = jwt.verify(token, config.APP_SECRET);
+            // const { id, email, type, role } = decoded;
+            return { db, agency: { id: 0, email: '', type: '', role: '', iat: 0, exp: 0 } };
         }
-        console.log('decoded :::', decoded);
-        return { db, agency: decoded };
     },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

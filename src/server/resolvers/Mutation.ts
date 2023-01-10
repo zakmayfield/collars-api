@@ -17,8 +17,6 @@ const generateToken = (
   );
 
 export const Mutation = {
-  test: () => 'test',
-
   registerAgency: async (_parent, args, context) => {
     const { name, email, password } = args.input;
 
@@ -78,5 +76,5 @@ export const Mutation = {
     };
 
     return validAgency;
-  },
+  }
 };

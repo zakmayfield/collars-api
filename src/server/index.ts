@@ -8,6 +8,7 @@ import { typeDefs } from './typeDefs';
 import config from './config';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import { GraphQLError } from 'graphql';
 
 dotenv.config();
 
@@ -32,18 +33,21 @@ interface ContextReturn {
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req }: { req: any }): Promise<ContextReturn> => {
-    const db = prisma;
-    let agency = {};
+    // variables
     let token;
     let decoded;
+    const agency = {}
+    const db = prisma;
 
+    // check auth headers and decode token if available
     if (req.headers && req.headers.authorization) {
-      token = req.headers.authorization.split(' ')[1].split('"')[0] || '';
-      decoded = jwt.verify(token, config.APP_SECRET);
-    }
+      token = req.headers.authorization.split(' ')[1].split('"')[0];
+      console.log('token', token)
+      // decoded = jwt.verify(token, config.APP_SECRET);
 
-    console.log('decoded :::', decoded);
+      // const { id, email, type, role } = decoded;
 
-    return { db, agency: decoded };
+      return { db, agency: { id: 0, email: '', type: '', role: '', iat: 0, exp: 0} };
+    } 
   },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));
