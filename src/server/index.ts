@@ -8,7 +8,6 @@ import { typeDefs } from './typeDefs';
 import config from './config';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
-import { GraphQLError } from 'graphql';
 
 dotenv.config();
 
@@ -26,33 +25,36 @@ const server = new ApolloServer({
 
 interface ContextReturn {
   db: PrismaClient;
-  agency?: AgencyContext;
+  agency?: AgencyContext | null;
   user?: UserContext;
 }
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req }: { req: any }): Promise<ContextReturn> => {
-    let token: string;
     const db = prisma;
+    let agency: AgencyContext = null
+    let token: string = req?.headers?.authorization ? req?.headers?.authorization.split(' ')[1] : ''
 
-    // check auth headers and decode token if available
-    if (req.headers && req.headers.authorization) {
-      token = req.headers.authorization.split(' ')[1].split('"')[0];
-      
-      const{ id, email} = jwt.verify(token, config.APP_SECRET);
-
-      const agency: AgencyContext = {
-        id,
-        email
+    if (token) {
+      if (token.includes('"')) {
+        token = token.split('"')[0]
       }
 
-      return {
-        db,
-        agency
-      };
+      const { id, email} = jwt.verify(token, config.APP_SECRET);
+      
+      agency = {
+        id,
+        email,
+        token
+      }
     }
 
-    throw new GraphQLError(`🚫 No auth ::: please provide token :::`)
+    console.log('::: agency ctx :::', agency)
+
+    return {
+      db,
+      agency
+    };
   },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

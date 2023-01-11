@@ -23,15 +23,23 @@ exports.Query = {
         }
         return pets;
     },
-    getAgencies: async (_parent, _args, context) => {
-        const agencies = await context.db.agency.findMany({});
+    getAgencies: async (_parent, _args, { db, agency }) => {
+        console.log('::: agency from query :::', agency);
+        if (!agency)
+            throw new Error(`::: 🚫 No authenticated entity :::`);
+        const agencies = await db.agency.findMany({});
         return agencies;
     },
-    getAgencyById: async (_parent, _args, context) => {
-        const agency = await context.db.agency.findUnique({
-            where: { email: 'email-2' }
+    getAgencyById: async (_parent, _args, { db, agency }) => {
+        const { id } = agency;
+        const result = await db.agency.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            },
         });
-        console.log('::: getAgencyById Query :::', context.agency);
-        return agency;
+        return result;
     },
 };

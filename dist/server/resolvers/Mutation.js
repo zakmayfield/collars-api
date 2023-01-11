@@ -7,7 +7,7 @@ exports.Mutation = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const generateToken = (id, email, type, role) => jsonwebtoken_1.default.sign({ id: id, email: email, type: type, role: role }, config_1.default.APP_SECRET, {
+const generateToken = (id, email) => jsonwebtoken_1.default.sign({ id: id, email: email }, config_1.default.APP_SECRET, {
     expiresIn: '2d',
 });
 exports.Mutation = {
@@ -36,7 +36,7 @@ exports.Mutation = {
         });
         const validAgency = {
             ...createdAgency,
-            token: generateToken(createdAgency.id, createdAgency.email, 'agency', null),
+            token: generateToken(createdAgency.id, createdAgency.email),
         };
         return validAgency;
     },
@@ -51,10 +51,10 @@ exports.Mutation = {
         const valid = await bcrypt_1.default.compare(password, agency.password);
         if (!valid)
             throw new Error(`🚫 Invalid password`);
-        const validAgency = {
+        const authenticatedAgency = {
             ...agency,
-            token: generateToken(agency.id, agency.email, 'agency', null),
+            token: generateToken(agency.id, agency.email),
         };
-        return validAgency;
+        return authenticatedAgency;
     }
 };
