@@ -67,6 +67,5 @@ const server = new server_1.ApolloServer({
             db,
             agency
         };
-        // throw new GraphQLError(`🚫 No auth ::: please provide token :::`)
     },
 }).then(({ url }) => console.log(`🚀 Server running at ${url}`));

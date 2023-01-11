@@ -35,6 +35,7 @@ startStandaloneServer(server, {
     const db = prisma;
     let agency: AgencyContext = null
     let token: string = req?.headers?.authorization ? req?.headers?.authorization.split(' ')[1] : ''
+    
 
     if (token) {
       if (token.includes('"')) {

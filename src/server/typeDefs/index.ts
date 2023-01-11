@@ -3,6 +3,7 @@ export const typeDefs = `#graphql
         getPets: [Pet!]!
         getAgencies: [Agency!]!
         getAgencyById(id: ID!): Agency!
+        getAgency: Agency!
     }
 
     type Mutation {
