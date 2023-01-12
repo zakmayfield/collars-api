@@ -24,13 +24,34 @@ const server = new ApolloServer({
 });
 
 interface ContextReturn {
+  req: any;
   db: PrismaClient;
   agency?: AgencyContext | null;
   user?: UserContext;
 }
 
+const authenticate = async (resolve, root, args, context, info) => {
+  // const { req } = context;
+  // // check if the user is authenticated here
+  // const user = await authenticateUser(req);
+  // if (!user) {
+  //   throw new AuthenticationError(
+  //     'You must be logged in to access this resource.'
+  //   );
+  // }
+  // // check if the user is authorized here
+  // if (!authorizeUser(user)) {
+  //   throw new ForbiddenError(
+  //     'You do not have permission to access this resource.'
+  //   );
+  // }
+  // // attach the user to the context
+  // context.user = user;
+  return resolve(root, args, context, info);
+};
+
+
 startStandaloneServer(server, {
-  listen: { port: 4000 },
   context: async ({ req }: { req: any }): Promise<ContextReturn> => {
     const db = prisma;
     let agency: AgencyContext = null
@@ -54,6 +75,7 @@ startStandaloneServer(server, {
     console.log('::: agency ctx :::', agency)
 
     return {
+      req,
       db,
       agency
     };
