@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "module": "module",
+  "type": "module",
   "scripts": {
     "dev": "nodemon ./src/server/index.ts",
     "compile": "tsc",

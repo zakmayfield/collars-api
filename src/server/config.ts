@@ -1,5 +1,3 @@
-const config = {
+module.exports = {
   APP_SECRET: process.env.APP_SECRET,
 };
-
-export default config;

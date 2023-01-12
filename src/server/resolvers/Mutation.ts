@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from '../config';
+const config = require('../config')
 import bcrypt from 'bcrypt';
 
 const generateToken = (
