@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import { AgencyContext, UserContext } from './../types/index';
 import { PrismaClient } from '@prisma/client';
 import { ApolloServer } from '@apollo/server';
@@ -7,11 +8,107 @@ import { Mutation } from './resolvers/Mutation';
 import { typeDefs } from './typeDefs';
 import config from './config';
 import jwt from 'jsonwebtoken';
-import * as dotenv from 'dotenv';
+
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
+interface ContextReturn {
+  req: any;
+  db: PrismaClient;
+  agency?: AgencyContext | null;
+  user?: UserContext;
+}
 const prisma = new PrismaClient();
+
+
+
+/* ::: expressMiddleware ::: */
+
+
+
+// const app = express()
+// const prisma = new PrismaClient();
+
+// const httpServer = http.createServer(app)
+
+// const resolvers = {
+//   Query,
+//   Mutation,
+// };
+
+// const server = new ApolloServer({
+//   typeDefs,
+//   resolvers,
+//   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+// });
+
+// const start = async () => await server.start()
+
+// start()
+
+// app.use(
+//   '/',
+//   cors<cors.CorsRequest>(),
+//   // 50mb === default
+//   bodyParser.json({ limit: '50mb' }),
+//   // similar to startStandAloneServer(server, { ... })
+//   expressMiddleware(server, {
+//     context: async ({ req }: { req: any }): Promise<ContextReturn> => {
+//     const db = prisma;
+//     let agency: AgencyContext = null
+//     let token: string = req?.headers?.authorization ? req?.headers?.authorization.split(' ')[1] : ''
+    
+
+//     if (token) {
+//       if (token.includes('"')) {
+//         token = token.split('"')[0]
+//       }
+
+//       const { id, email} = jwt.verify(token, config.APP_SECRET);
+      
+//       agency = {
+//         id,
+//         email,
+//         token
+//       }
+//     }
+
+//     console.log('::: agency ctx :::', agency)
+
+//     return {
+//       req,
+//       db,
+//       agency
+//     };
+//   },
+//   })
+// );
+
+// const startServer = async () => {
+//   return await new Promise<void>((resolve) =>
+//     httpServer.listen({ port: 4000 }, resolve)
+//   );
+// }
+
+// startServer()
+
+
+// console.log(`🚀 Server ready at http://localhost:4000/`);
+
+
+
+/* ::: end expressMiddleware ::: */
+
+
+
+
+
 
 const resolvers = {
   Query,
