@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.typeDefs = void 0;
-exports.typeDefs = `#graphql
+const typeDefs = `#graphql
     type Query {
         getPets: [Pet!]!
         getAgencies: [Agency!]!
@@ -10,7 +7,6 @@ exports.typeDefs = `#graphql
     }
 
     type Mutation {
-        test: String!
         registerAgency(input: RegisterAgency!): Agency!
         loginAgency(input: LoginAgency!): Agency!
     }
@@ -280,3 +276,4 @@ exports.typeDefs = `#graphql
         petProfileId: Int!
     }
 `;
+export { typeDefs };

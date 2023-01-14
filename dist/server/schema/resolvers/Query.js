@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Query = void 0;
-exports.Query = {
+const Query = {
     getPets: async (_parent, args, context) => {
         const pets = await context.db.pet.findMany({
             include: {
@@ -58,3 +55,4 @@ exports.Query = {
         return result;
     },
 };
+export { Query };

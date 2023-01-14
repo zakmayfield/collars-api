@@ -1,4 +1,4 @@
-export const Query = {
+const Query = {
   getPets: async (_parent, args, context) => {
     const pets = await context.db.pet.findMany({
       include: {
@@ -65,3 +65,5 @@ export const Query = {
     return result;
   },
 };
+
+export { Query };
