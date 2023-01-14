@@ -51,5 +51,10 @@ const Mutation = {
         };
         return authenticatedAgency;
     },
+    updateAgency: async (_parent, { input }, { db, agency }) => {
+        if (!agency)
+            throw new Error(`::: 🚫 No authenticated entity :::`);
+        const { name, email } = input;
+    },
 };
 export { Mutation };

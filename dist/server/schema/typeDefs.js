@@ -1,14 +1,13 @@
 const typeDefs = `#graphql
     type Query {
-        getPets: [Pet!]!
-        getAgencies: [Agency!]!
-        getAgencyById(id: ID!): Agency!
         getAgency: Agency!
+        getAgencies: [Agency!]!
     }
 
     type Mutation {
-        registerAgency(input: RegisterAgency!): Agency!
         loginAgency(input: LoginAgency!): Agency!
+        registerAgency(input: RegisterAgency!): Agency!
+        updateAgency(input: UpdateAgency!): Agency!
     }
 
     input RegisterAgency {
@@ -20,6 +19,11 @@ const typeDefs = `#graphql
     input LoginAgency {
         email: String!
         password: String!
+    }
+
+    input UpdateAgency {
+        name: String
+        email: String
     }
 
 

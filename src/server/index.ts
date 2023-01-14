@@ -31,32 +31,37 @@ app.use(
   expressMiddleware(server, {
     context: async ({ req }) => {
           const db = prisma;
-          let agency: AgencyContext = null;
-          let user: UserContext = null;
-          let token: string = req?.headers?.authorization
-            ? req?.headers?.authorization.split(' ')[1]
-            : '';
-
-          if (token) {
-            if (token.includes('"')) {
-              token = token.split('"')[0];
-            }
-
-            const { id, email } = jwt.verify(token, config.APP_SECRET);
-
-            agency = {
-              id,
-              email,
-              token,
-            };
+          let agency: AgencyContext = {
+              id: 1,
+              email: 'pawsandclaws@gmail.com',
+              token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJwYXdzYW5kY2xhd3NAZ21haWwuY29tIiwiaWF0IjoxNjczNzI3ODU5LCJleHAiOjE2NzM5MDA2NTl9.aLqXWpro7j1B0q5-OAvn8AuaRCY6YOgDfbu8_nZekAA'
           }
+          // let agency: AgencyContext = null;
+          // let user: UserContext = null;
+          // let token: string = req?.headers?.authorization
+          //   ? req?.headers?.authorization.split(' ')[1]
+          //   : '';
 
-          console.log('::: agency ctx :::', agency);
+          // if (token) {
+          //   if (token.includes('"')) {
+          //     token = token.split('"')[0];
+          //   }
+
+          //   const { id, email } = jwt.verify(token, config.APP_SECRET);
+
+          //   agency = {
+          //     id,
+          //     email,
+          //     token,
+          //   };
+          // }
+
+          // console.log('::: agency ctx :::', agency);
 
           return {
             req,
             db,
-            agency,
+            agency, 
           };
     },
   })
