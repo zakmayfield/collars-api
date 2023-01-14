@@ -22,6 +22,7 @@ app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(serve
     context: async ({ req }) => {
         const db = prisma;
         let agency = null;
+        let user = null;
         let token = req?.headers?.authorization
             ? req?.headers?.authorization.split(' ')[1]
             : '';
