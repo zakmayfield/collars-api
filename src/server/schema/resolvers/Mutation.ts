@@ -1,20 +1,13 @@
 import jwt from 'jsonwebtoken';
-import config from '../config';
+import { config } from '../../config.js';
 import bcrypt from 'bcrypt';
 
-const generateToken = (
-  id: number,
-  email: string
-) =>
-  jwt.sign(
-    { id: id, email: email },
-    config.APP_SECRET,
-    {
-      expiresIn: '2d',
-    }
-  );
+const generateToken = (id: number, email: string) =>
+  jwt.sign({ id: id, email: email }, config.APP_SECRET, {
+    expiresIn: '2d',
+  });
 
-export const Mutation = {
+const Mutation = {
   registerAgency: async (_parent, args, context) => {
     const { name, email, password } = args.input;
 
@@ -74,5 +67,7 @@ export const Mutation = {
     };
 
     return authenticatedAgency;
-  }
+  },
 };
+
+export { Mutation };

@@ -1,4 +1,4 @@
-export const typeDefs = `#graphql
+const typeDefs = `#graphql
     type Query {
         getPets: [Pet!]!
         getAgencies: [Agency!]!
@@ -276,3 +276,4 @@ export const typeDefs = `#graphql
         petProfileId: Int!
     }
 `;
+export { typeDefs };
