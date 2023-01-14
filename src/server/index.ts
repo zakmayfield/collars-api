@@ -32,6 +32,7 @@ app.use(
     context: async ({ req }) => {
           const db = prisma;
           let agency: AgencyContext = null;
+          let user: UserContext = null;
           let token: string = req?.headers?.authorization
             ? req?.headers?.authorization.split(' ')[1]
             : '';
