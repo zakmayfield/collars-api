@@ -7,11 +7,11 @@ const Query = {
 
     const result = await db.agency.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
+      include: {
+        profile: true,
+        pets: true,
+        volunteers: true
+      }
     });
 
     return result;

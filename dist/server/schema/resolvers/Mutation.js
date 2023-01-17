@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../../config.js';
 import bcrypt from 'bcrypt';
 const generateToken = (id, email) => jwt.sign({ id: id, email: email }, config.APP_SECRET, {
-    expiresIn: '2d',
+    expiresIn: '7d',
 });
 const Mutation = {
     registerAgency: async (_parent, args, context) => {

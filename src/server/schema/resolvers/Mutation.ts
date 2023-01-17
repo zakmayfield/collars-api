@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 const generateToken = (id: number, email: string) =>
   jwt.sign({ id: id, email: email }, config.APP_SECRET, {
-    expiresIn: '2d',
+    expiresIn: '7d',
   });
 
 const Mutation = {
