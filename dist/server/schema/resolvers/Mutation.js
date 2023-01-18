@@ -51,10 +51,17 @@ const Mutation = {
         };
         return authenticatedAgency;
     },
-    updateAgency: async (_parent, { input }, { db, agency }) => {
+    createOrUpdateAgencyProfile: async (_parent, { input }, { db, agency }) => {
         if (!agency)
             throw new Error(`::: 🚫 No authenticated entity :::`);
-        const { name, email } = input;
+        const { bio } = input;
+        console.log('::: bio', bio && true || false);
+        const updatedAgencyProfile = await db.agencyProfile.upsert({
+            where: { agencyId: agency.id },
+            update: { bio },
+            create: { bio }
+        });
+        return updatedAgencyProfile;
     },
 };
 export { Mutation };

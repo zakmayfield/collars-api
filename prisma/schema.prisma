@@ -17,8 +17,8 @@ model Address {
   zip       Int
   country   String  @db.VarChar(100)
 
-  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
-  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
+  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   agencyProfileId Int?
   userProfileId   Int? @unique
@@ -30,8 +30,8 @@ model Contact {
   phone String? @db.VarChar(50)
   email String? @db.VarChar(75)
 
-  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id])
-  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id])
+  agencyProfile AgencyProfile? @relation(fields: [agencyProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userProfile   UserProfile?   @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   agencyProfileId Int?
   userProfileId   Int? @unique
@@ -59,7 +59,7 @@ model AgencyProfile {
   addresses Address[]
   contacts  Contact[]
 
-  agency   Agency @relation(fields: [agencyId], references: [id])
+  agency   Agency @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId Int    @unique
 }
 
@@ -76,7 +76,7 @@ model User {
 
   savedPets UsersToPets[]
 
-  agency   Agency? @relation(fields: [agencyId], references: [id])
+  agency   Agency? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId Int?
 }
 
@@ -90,14 +90,14 @@ model UserProfile {
   contact Contact?
   address Address?
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId Int  @unique
 }
 
 model UsersToPets {
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId Int
-  pet    Pet  @relation(fields: [petId], references: [id])
+  pet    Pet  @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petId  Int
 
   @@id([userId, petId])
@@ -113,7 +113,7 @@ model Pet {
 
   profile PetProfile?
 
-  agency   Agency? @relation(fields: [agencyId], references: [id])
+  agency   Agency? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId Int
 }
 
@@ -140,7 +140,7 @@ model PetProfile {
   color  ColorsToPetProfiles[]
   images ImagesToPetProfiles[]
 
-  pet   Pet @relation(fields: [petId], references: [id])
+  pet   Pet @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petId Int @unique
 }
 
@@ -153,9 +153,9 @@ model Color {
 }
 
 model ColorsToPetProfiles {
-  color        Color      @relation(fields: [colorId], references: [id])
+  color        Color      @relation(fields: [colorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   colorId      Int
-  petProfile   PetProfile @relation(fields: [petProfileId], references: [id])
+  petProfile   PetProfile @relation(fields: [petProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petProfileId Int
 
   @@id([colorId, petProfileId])
@@ -172,9 +172,9 @@ model Image {
 }
 
 model ImagesToPetProfiles {
-  image        Image      @relation(fields: [imageId], references: [id])
+  image        Image      @relation(fields: [imageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   imageId      Int
-  petProfile   PetProfile @relation(fields: [petProfileId], references: [id])
+  petProfile   PetProfile @relation(fields: [petProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petProfileId Int
 
   @@id([imageId, petProfileId])
@@ -189,9 +189,9 @@ model Breed {
 }
 
 model BreedsToPets {
-  breed   Breed @relation(fields: [breedId], references: [id])
+  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   breedId Int
-  pet     Pet   @relation(fields: [petId], references: [id])
+  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petId   Int
 
   @@id([breedId, petId])
@@ -206,9 +206,9 @@ model Species {
 }
 
 model SpeciesToPets {
-  species   Species @relation(fields: [speciesId], references: [id])
+  species   Species @relation(fields: [speciesId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   speciesId Int
-  pet     Pet   @relation(fields: [petId], references: [id])
+  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petId   Int
 
   @@id([speciesId, petId])

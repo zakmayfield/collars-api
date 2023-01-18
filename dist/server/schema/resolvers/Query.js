@@ -9,7 +9,20 @@ const Query = {
             include: {
                 profile: true,
                 pets: true,
-                volunteers: true
+                volunteers: true,
+            },
+        });
+        return result;
+    },
+    getAgencyProfile: async (_parent, _args, { db, agency }) => {
+        if (!agency)
+            throw new Error(`::: 🚫 No authenticated entity :::`);
+        const { id } = agency;
+        const result = await db.agencyProfile.findUnique({
+            where: { agencyId: id },
+            include: {
+                addresses: true,
+                contacts: true,
             }
         });
         return result;

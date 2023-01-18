@@ -2,12 +2,13 @@ const typeDefs = `#graphql
     type Query {
         getAgency: Agency!
         getAgencies: [Agency!]!
+        getAgencyProfile: AgencyProfile
     }
 
     type Mutation {
         loginAgency(input: LoginAgency!): Agency!
         registerAgency(input: RegisterAgency!): Agency!
-        updateAgency(input: UpdateAgency!): Agency!
+        createOrUpdateAgencyProfile(input: CreateOrUpdateAgency!): AgencyProfile!
     }
 
     input RegisterAgency {
@@ -21,9 +22,8 @@ const typeDefs = `#graphql
         password: String!
     }
 
-    input UpdateAgency {
-        name: String
-        email: String
+    input CreateOrUpdateAgency {
+        bio: String
     }
 
 
