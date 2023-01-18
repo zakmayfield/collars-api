@@ -1,6 +1,19 @@
 const Query = {
-  // GET agency by ID
+  // GET agency with only base data // { id, name, email, token, password }
   getAgency: async (_parent, _args, { db, agency }) => {
+    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    const { id } = agency;
+
+    const result = await db.agency.findUnique({
+      where: { id },
+    });
+
+    return result;
+  },
+
+  // GET agency w/ extra data // { ...agency, profile, pets, volunteers}
+  getAgencyWithData: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 
     const { id } = agency;
@@ -14,26 +27,12 @@ const Query = {
       },
     });
 
-    return result;
-  },
-
-  getAgencyProfile: async (_parent, _args, { db, agency }) => {
-    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
-
-    const { id } = agency;
-
-    const result = await db.agencyProfile.findUnique({
-      where: { agencyId: id },
-      include: {
-        addresses: true,
-        contacts: true,
-      }
-    });
+    console.log(`::: result from getAgencyQuery :::`, result);
 
     return result;
   },
 
-  // GET all agencies
+  // GET all agencies with only base data // { id, name, email, token, password }
   getAgencies: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 

@@ -42,7 +42,7 @@ app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(serve
                 token,
             };
         }
-        // console.log('::: agency ctx :::', agency);
+        console.log('::: agency ctx :::', agency);
         return {
             req,
             db,

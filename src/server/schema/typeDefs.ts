@@ -1,8 +1,8 @@
 const typeDefs = `#graphql
     type Query {
-        getAgency: Agency!
-        getAgencies: [Agency!]!
-        getAgencyProfile: AgencyProfile
+        getAgency: AgencyBase!
+        getAgencies: [Agency]!
+        getAgencyWithData: Agency!
     }
 
     type Mutation {
@@ -79,6 +79,15 @@ const typeDefs = `#graphql
         profile: AgencyProfile
         pets: [Pet]!
         volunteers: [User]!
+    }
+
+    type AgencyBase {
+        id: ID!
+
+        name: String!
+        email: String!
+        password: String!
+        token: String
     }
 
     type AgencyProfile {
