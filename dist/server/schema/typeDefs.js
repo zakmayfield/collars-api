@@ -79,6 +79,9 @@ const typeDefs = `#graphql
         profile: AgencyProfile
         pets: [Pet]!
         volunteers: [User]!
+
+        createdAt: String
+        updatedAt: String
     }
 
     type AgencyBase {
@@ -93,7 +96,6 @@ const typeDefs = `#graphql
     type AgencyProfile {
         id: ID!
 
-        username: String!
         bio: String
         
         contacts: [Contact]!
@@ -113,7 +115,7 @@ const typeDefs = `#graphql
         username: String!
         email: String!
         password: String!
-        role: String!
+        role: UserRole!
         token: String
 
         profile: UserProfile
@@ -121,6 +123,14 @@ const typeDefs = `#graphql
         savedPets: [UsersToPets]!
 
         agencyId: Int
+
+        createdAt: String
+        updatedAt: String
+    }
+
+    enum UserRole {
+        ADOPTER
+        VOLUNTEER
     }
 
     type UserProfile {
@@ -152,7 +162,7 @@ const typeDefs = `#graphql
         id: ID!
 
         name: String!
-        species: [SpeciesToPets]
+        species: Species!
         breed: [BreedsToPets]
         savedBy: [UsersToPets]
 
@@ -160,6 +170,19 @@ const typeDefs = `#graphql
         agency: Agency!
 
         agencyId: Int!
+
+        createdAt: String
+        updatedAt: String
+    }
+
+    enum Species {
+        CAT
+        DOG
+        BIRD
+        HORSE
+        FISH
+        REPTILE
+        BARNYARD
     }
 
     type PetProfile {
@@ -167,62 +190,74 @@ const typeDefs = `#graphql
 
         age: Int
         bio: String
-        sex: String
         weight: Int
         birthday: String
-        coat: String
-        goodWith: String
-        personalityType: String
-        dietRestrictions: String
-        isHouseTrained: Boolean
-        isAvailable: Boolean!
 
-        color: [ColorsToPetProfiles]
+        isFixed: Boolean
+        isAvailable: Boolean!
+        isHouseTrained: Boolean
+        isVaccineCurent: Boolean
+
+        sex: Sex
+        coat: Coat
+        diet: Diet
+        color: Color
+        goodWith: GoodWith
+        personality: Personality
+
         images: [ImagesToPetProfiles]
 
         pet: Pet!
         petId: Int!
     }
 
-
-
-
-    # ::: color :::
-    type Color {
-        id: ID!
-       
-
-        color: String!
-
-        pets: [ColorsToPetProfiles]
+    enum Sex {
+        UNKNOWN
+        FEMALE
+        MALE
     }
 
-    type ColorsToPetProfiles {
-        color: Color!
-        colorId: Int!
-        petProfile: PetProfile!
-        petProfileId: Int!
+    enum Color {
+        UNKNOWN
+        BLACK
+        WHITE
+        BROWN
+        GOLDEN
+        BRINDLE
     }
 
-
-
-
-    # ::: species :::
-    type Species {
-        id: ID!
-
-        species: String!
-
-        pets: [SpeciesToPets]
+    enum Personality {
+        UNKNOWN
+        ACTIVE
+        CURIOUS
+        GOOFY
+        HYPER
+        LAZY
+        LONER
     }
 
-    type SpeciesToPets {
-        species: Species!
-        speciesId: Int!
-        pet: Pet!
-        petId: Int!
+    enum Diet {
+        STANDARD  
+        MEDICAL
+        WEIGHT
     }
 
+    enum Coat { 
+        UNKNOWN
+        SHORT
+        MEDIUM
+        LONG
+        NONE
+    }
+
+    enum GoodWith {
+        UNKNOWN
+        CATS
+        DOGS
+        CHILDREN
+        CATS_AND_DOGS
+        ALL
+    }
 
 
 

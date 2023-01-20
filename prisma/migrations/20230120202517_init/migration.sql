@@ -1,3 +1,27 @@
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('ADOPTER', 'VOLUNTEER');
+
+-- CreateEnum
+CREATE TYPE "Species" AS ENUM ('CAT', 'DOG', 'BIRD', 'HORSE', 'FISH', 'REPTILE', 'BARNYARD');
+
+-- CreateEnum
+CREATE TYPE "Sex" AS ENUM ('UNKNOWN', 'FEMALE', 'MALE');
+
+-- CreateEnum
+CREATE TYPE "Color" AS ENUM ('UNKNOWN', 'BLACK', 'WHITE', 'BROWN', 'GOLDEN', 'SPOTTED', 'BRINDLE');
+
+-- CreateEnum
+CREATE TYPE "Personality" AS ENUM ('UNKNOWN', 'ACTIVE', 'CURIOUS', 'GOOFY', 'HYPER', 'LAZY', 'LONER');
+
+-- CreateEnum
+CREATE TYPE "Diet" AS ENUM ('STANDARD', 'MEDICAL', 'WEIGHT');
+
+-- CreateEnum
+CREATE TYPE "Coat" AS ENUM ('UNKNOWN', 'SHORT', 'MEDIUM', 'LONG', 'NONE');
+
+-- CreateEnum
+CREATE TYPE "GoodWith" AS ENUM ('UNKNOWN', 'CATS', 'DOGS', 'CHILDREN', 'CATS_AND_DOGS', 'ALL');
+
 -- CreateTable
 CREATE TABLE "Address" (
     "id" SERIAL NOT NULL,
@@ -31,6 +55,8 @@ CREATE TABLE "Agency" (
     "email" VARCHAR(75) NOT NULL,
     "password" VARCHAR(128) NOT NULL,
     "token" VARCHAR(256),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Agency_pkey" PRIMARY KEY ("id")
 );
@@ -38,7 +64,6 @@ CREATE TABLE "Agency" (
 -- CreateTable
 CREATE TABLE "AgencyProfile" (
     "id" SERIAL NOT NULL,
-    "username" VARCHAR(50) NOT NULL,
     "bio" VARCHAR(500),
     "agencyId" INTEGER NOT NULL,
 
@@ -51,9 +76,11 @@ CREATE TABLE "User" (
     "username" VARCHAR(20) NOT NULL,
     "email" VARCHAR(75) NOT NULL,
     "password" VARCHAR(128) NOT NULL,
-    "role" VARCHAR(25) NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'ADOPTER',
     "token" VARCHAR(256),
     "agencyId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -81,7 +108,10 @@ CREATE TABLE "UsersToPets" (
 CREATE TABLE "Pet" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
+    "species" "Species" NOT NULL,
     "agencyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Pet_pkey" PRIMARY KEY ("id")
 );
@@ -91,36 +121,38 @@ CREATE TABLE "PetProfile" (
     "id" SERIAL NOT NULL,
     "age" INTEGER,
     "bio" VARCHAR(250),
-    "sex" VARCHAR(50),
     "weight" INTEGER,
-    "coat" VARCHAR(25),
     "birthday" VARCHAR(128),
-    "goodWith" VARCHAR(50),
-    "personalityType" VARCHAR(50),
-    "isHouseTrained" BOOLEAN,
-    "dietRestrictions" TEXT,
-    "isVaccineCurrent" BOOLEAN,
     "isFixed" BOOLEAN,
+    "isAdopted" BOOLEAN NOT NULL DEFAULT false,
     "isAvailable" BOOLEAN NOT NULL,
+    "isHouseTrained" BOOLEAN,
+    "isVaccineCurrent" BOOLEAN,
+    "sex" "Sex" DEFAULT 'UNKNOWN',
+    "coat" "Coat" DEFAULT 'UNKNOWN',
+    "diet" "Diet" DEFAULT 'STANDARD',
+    "color" "Color" DEFAULT 'UNKNOWN',
+    "goodWith" "GoodWith" DEFAULT 'UNKNOWN',
+    "personality" "Personality" DEFAULT 'UNKNOWN',
     "petId" INTEGER NOT NULL,
 
     CONSTRAINT "PetProfile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Color" (
+CREATE TABLE "Breed" (
     "id" SERIAL NOT NULL,
-    "color" TEXT NOT NULL,
+    "breed" TEXT NOT NULL,
 
-    CONSTRAINT "Color_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Breed_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "ColorsToPetProfiles" (
-    "colorId" INTEGER NOT NULL,
-    "petProfileId" INTEGER NOT NULL,
+CREATE TABLE "BreedsToPets" (
+    "breedId" INTEGER NOT NULL,
+    "petId" INTEGER NOT NULL,
 
-    CONSTRAINT "ColorsToPetProfiles_pkey" PRIMARY KEY ("colorId","petProfileId")
+    CONSTRAINT "BreedsToPets_pkey" PRIMARY KEY ("breedId","petId")
 );
 
 -- CreateTable
@@ -141,38 +173,6 @@ CREATE TABLE "ImagesToPetProfiles" (
     CONSTRAINT "ImagesToPetProfiles_pkey" PRIMARY KEY ("imageId","petProfileId")
 );
 
--- CreateTable
-CREATE TABLE "Breed" (
-    "id" SERIAL NOT NULL,
-    "breed" TEXT NOT NULL,
-
-    CONSTRAINT "Breed_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "BreedsToPets" (
-    "breedId" INTEGER NOT NULL,
-    "petId" INTEGER NOT NULL,
-
-    CONSTRAINT "BreedsToPets_pkey" PRIMARY KEY ("breedId","petId")
-);
-
--- CreateTable
-CREATE TABLE "Species" (
-    "id" SERIAL NOT NULL,
-    "species" TEXT NOT NULL,
-
-    CONSTRAINT "Species_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SpeciesToPets" (
-    "speciesId" INTEGER NOT NULL,
-    "petId" INTEGER NOT NULL,
-
-    CONSTRAINT "SpeciesToPets_pkey" PRIMARY KEY ("speciesId","petId")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "Address_userProfileId_key" ON "Address"("userProfileId");
 
@@ -184,9 +184,6 @@ CREATE UNIQUE INDEX "Agency_name_key" ON "Agency"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Agency_email_key" ON "Agency"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "AgencyProfile_username_key" ON "AgencyProfile"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AgencyProfile_agencyId_key" ON "AgencyProfile"("agencyId");
@@ -204,13 +201,7 @@ CREATE UNIQUE INDEX "UserProfile_userId_key" ON "UserProfile"("userId");
 CREATE UNIQUE INDEX "PetProfile_petId_key" ON "PetProfile"("petId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Color_color_key" ON "Color"("color");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Breed_breed_key" ON "Breed"("breed");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Species_species_key" ON "Species"("species");
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_agencyProfileId_fkey" FOREIGN KEY ("agencyProfileId") REFERENCES "AgencyProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -246,25 +237,13 @@ ALTER TABLE "Pet" ADD CONSTRAINT "Pet_agencyId_fkey" FOREIGN KEY ("agencyId") RE
 ALTER TABLE "PetProfile" ADD CONSTRAINT "PetProfile_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ColorsToPetProfiles" ADD CONSTRAINT "ColorsToPetProfiles_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "Color"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ColorsToPetProfiles" ADD CONSTRAINT "ColorsToPetProfiles_petProfileId_fkey" FOREIGN KEY ("petProfileId") REFERENCES "PetProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ImagesToPetProfiles" ADD CONSTRAINT "ImagesToPetProfiles_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ImagesToPetProfiles" ADD CONSTRAINT "ImagesToPetProfiles_petProfileId_fkey" FOREIGN KEY ("petProfileId") REFERENCES "PetProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "BreedsToPets" ADD CONSTRAINT "BreedsToPets_breedId_fkey" FOREIGN KEY ("breedId") REFERENCES "Breed"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BreedsToPets" ADD CONSTRAINT "BreedsToPets_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SpeciesToPets" ADD CONSTRAINT "SpeciesToPets_speciesId_fkey" FOREIGN KEY ("speciesId") REFERENCES "Species"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ImagesToPetProfiles" ADD CONSTRAINT "ImagesToPetProfiles_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SpeciesToPets" ADD CONSTRAINT "SpeciesToPets_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ImagesToPetProfiles" ADD CONSTRAINT "ImagesToPetProfiles_petProfileId_fkey" FOREIGN KEY ("petProfileId") REFERENCES "PetProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
