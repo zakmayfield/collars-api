@@ -206,6 +206,23 @@ enum GoodWith {
   ALL
 }
 
+model Breed {
+  id Int @id @default(autoincrement())
+
+  breed String @unique
+
+  pets BreedsToPets[]
+}
+
+model BreedsToPets {
+  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  breedId Int
+  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petId   Int
+
+  @@id([breedId, petId])
+}
+
 model Image {
   id Int @id @default(autoincrement())
 
@@ -223,21 +240,4 @@ model ImagesToPetProfiles {
   petProfileId Int
 
   @@id([imageId, petProfileId])
-}
-
-model Breed {
-  id Int @id @default(autoincrement())
-
-  breed String @unique
-
-  pets BreedsToPets[]
-}
-
-model BreedsToPets {
-  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  breedId Int
-  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId   Int
-
-  @@id([breedId, petId])
 }
