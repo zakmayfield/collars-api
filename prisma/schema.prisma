@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Address {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   address   String  @db.VarChar(100)
   apartment String? @db.VarChar(25)
@@ -25,7 +25,7 @@ model Address {
 }
 
 model Contact {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   phone String? @db.VarChar(50)
   email String? @db.VarChar(75)
@@ -38,7 +38,7 @@ model Contact {
 }
 
 model Agency {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   name     String  @unique @db.VarChar(28)
   email    String  @unique @db.VarChar(75)
@@ -51,9 +51,8 @@ model Agency {
 }
 
 model AgencyProfile {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  username String  @unique @db.VarChar(50)
   bio      String? @db.VarChar(500)
 
   addresses Address[]
@@ -64,13 +63,13 @@ model AgencyProfile {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  username String  @unique @db.VarChar(20)
-  email    String  @unique @db.VarChar(75)
-  password String  @db.VarChar(128)
-  role     String  @db.VarChar(25)
-  token    String? @db.VarChar(256)
+  username String   @unique @db.VarChar(20)
+  email    String   @unique @db.VarChar(75)
+  password String   @db.VarChar(128)
+  role     UserRole @default(ADOPTER)
+  token    String?  @db.VarChar(256)
 
   profile UserProfile?
 
@@ -80,8 +79,13 @@ model User {
   agencyId Int?
 }
 
+enum UserRole {
+  ADOPTER
+  VOLUNTEER
+}
+
 model UserProfile {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   firstName String? @db.VarChar(50)
   lastName  String? @db.VarChar(50)
@@ -104,10 +108,10 @@ model UsersToPets {
 }
 
 model Pet {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   name    String         @db.VarChar(50)
-  species SpeciesToPets[]
+  species Species
   breed   BreedsToPets[]
   savedBy UsersToPets[]
 
@@ -117,52 +121,93 @@ model Pet {
   agencyId Int
 }
 
+enum Species {
+  CAT
+  DOG
+  BIRD
+  HORSE
+  FISH
+  REPTILE
+  BARNYARD
+}
+
 model PetProfile {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   age      Int?
   bio      String? @db.VarChar(250)
-  sex      String? @db.VarChar(50)
   weight   Int?
-  coat     String? @db.VarChar(25)
   birthday String? @db.VarChar(128)
 
-  goodWith        String?  @db.VarChar(50)
-  personalityType String?  @db.VarChar(50)
-  isHouseTrained  Boolean?
-
-  dietRestrictions String?
-  isVaccineCurrent Boolean?
   isFixed          Boolean?
+  isAvailable      Boolean
+  isHouseTrained   Boolean?
+  isVaccineCurrent Boolean?
 
-  isAvailable Boolean
+  sex         Sex?         @default(UNKNOWN)
+  coat        Coat?        @default(UNKNOWN)
+  diet        Diet?        @default(STANDARD)
+  color       Color?       @default(UNKNOWN)
+  goodWith    GoodWith?    @default(UNKNOWN)
+  personality Personality? @default(UNKNOWN)
 
-  color  ColorsToPetProfiles[]
   images ImagesToPetProfiles[]
 
   pet   Pet @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   petId Int @unique
 }
 
-model Color {
-  id        Int      @id @default(autoincrement())
-
-  color String @unique
-
-  pets ColorsToPetProfiles[]
+enum Sex {
+  UNKNOWN
+  FEMALE
+  MALE
 }
 
-model ColorsToPetProfiles {
-  color        Color      @relation(fields: [colorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  colorId      Int
-  petProfile   PetProfile @relation(fields: [petProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petProfileId Int
+enum Color {
+  UNKNOWN
+  BLACK
+  WHITE
+  BROWN
+  GOLDEN
+  SPOTTED
+  BRINDLE
+}
 
-  @@id([colorId, petProfileId])
+enum Personality {
+  UNKNOWN
+  ACTIVE
+  CURIOUS
+  GOOFY
+  HYPER
+  LAZY
+  LONER
+}
+
+enum Diet {
+  STANDARD
+  MEDICAL
+  WEIGHT
+}
+
+enum Coat {
+  UNKNOWN
+  SHORT
+  MEDIUM
+  LONG
+  NONE
+}
+
+enum GoodWith {
+  UNKNOWN
+  CATS
+  DOGS
+  CHILDREN
+  CATS_AND_DOGS
+  ALL
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   url       String?
   file      String?
@@ -181,7 +226,7 @@ model ImagesToPetProfiles {
 }
 
 model Breed {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   breed String @unique
 
@@ -195,21 +240,4 @@ model BreedsToPets {
   petId   Int
 
   @@id([breedId, petId])
-}
-
-model Species {
-  id        Int      @id @default(autoincrement())
-
-  species String @unique
-
-  pets SpeciesToPets[]
-}
-
-model SpeciesToPets {
-  species   Species @relation(fields: [speciesId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  speciesId Int
-  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId   Int
-
-  @@id([speciesId, petId])
 }

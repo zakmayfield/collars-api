@@ -93,7 +93,6 @@ const typeDefs = `#graphql
     type AgencyProfile {
         id: ID!
 
-        username: String!
         bio: String
         
         contacts: [Contact]!
@@ -177,31 +176,20 @@ const typeDefs = `#graphql
         isHouseTrained: Boolean
         isAvailable: Boolean!
 
-        color: [ColorsToPetProfiles]
+        color: Color
         images: [ImagesToPetProfiles]
 
         pet: Pet!
         petId: Int!
     }
 
-
-
-
-    # ::: color :::
-    type Color {
-        id: ID!
-       
-
-        color: String!
-
-        pets: [ColorsToPetProfiles]
-    }
-
-    type ColorsToPetProfiles {
-        color: Color!
-        colorId: Int!
-        petProfile: PetProfile!
-        petProfileId: Int!
+    enum Color {
+        UNKNOWN
+        BLACK
+        WHITE
+        BROWN
+        GOLDEN
+        BRINDLE
     }
 
 
