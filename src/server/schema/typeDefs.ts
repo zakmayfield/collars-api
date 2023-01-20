@@ -79,6 +79,9 @@ const typeDefs = `#graphql
         profile: AgencyProfile
         pets: [Pet]!
         volunteers: [User]!
+
+        createdAt: String
+        updatedAt: String
     }
 
     type AgencyBase {
@@ -120,6 +123,9 @@ const typeDefs = `#graphql
         savedPets: [UsersToPets]!
 
         agencyId: Int
+
+        createdAt: String
+        updatedAt: String
     }
 
     enum UserRole {
@@ -164,6 +170,9 @@ const typeDefs = `#graphql
         agency: Agency!
 
         agencyId: Int!
+
+        createdAt: String
+        updatedAt: String
     }
 
     enum Species {

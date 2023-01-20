@@ -48,6 +48,9 @@ model Agency {
   profile    AgencyProfile?
   pets       Pet[]
   volunteers User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AgencyProfile {
@@ -77,6 +80,9 @@ model User {
 
   agency   Agency? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserRole {
@@ -119,6 +125,9 @@ model Pet {
 
   agency   Agency? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Species {
@@ -140,6 +149,7 @@ model PetProfile {
   birthday String? @db.VarChar(128)
 
   isFixed          Boolean?
+  isAdopted        Boolean @default(false)
   isAvailable      Boolean
   isHouseTrained   Boolean?
   isVaccineCurrent Boolean?
@@ -149,6 +159,7 @@ model PetProfile {
   diet        Diet?        @default(STANDARD)
   color       Color?       @default(UNKNOWN)
   goodWith    GoodWith?    @default(UNKNOWN)
+  
   personality Personality? @default(UNKNOWN)
 
   images ImagesToPetProfiles[]
