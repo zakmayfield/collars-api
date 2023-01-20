@@ -221,6 +221,7 @@ model Breed {
   id Int @id @default(autoincrement())
 
   breed String @unique
+  species Species
 
   pets BreedsToPets[]
 }

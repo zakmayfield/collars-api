@@ -266,8 +266,8 @@ const typeDefs = `#graphql
     type Breed {
         id: ID!
        
-
         breed: String!
+        species: Species!
 
         pets: [BreedsToPets]
     }

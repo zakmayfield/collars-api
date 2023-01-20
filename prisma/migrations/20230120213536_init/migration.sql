@@ -143,6 +143,7 @@ CREATE TABLE "PetProfile" (
 CREATE TABLE "Breed" (
     "id" SERIAL NOT NULL,
     "breed" TEXT NOT NULL,
+    "species" "Species" NOT NULL,
 
     CONSTRAINT "Breed_pkey" PRIMARY KEY ("id")
 );
