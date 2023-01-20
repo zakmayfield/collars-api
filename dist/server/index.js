@@ -21,6 +21,11 @@ await server.start();
 app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(server, {
     context: async ({ req }) => {
         const db = prisma;
+        // let agency: AgencyContext = {
+        //     id: 1,
+        //     email: 'pawsandclaws@gmail.com',
+        //     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJwYXdzYW5kY2xhd3NAZ21haWwuY29tIiwiaWF0IjoxNjczNzI3ODU5LCJleHAiOjE2NzM5MDA2NTl9.aLqXWpro7j1B0q5-OAvn8AuaRCY6YOgDfbu8_nZekAA'
+        // }
         let agency = null;
         let user = null;
         let token = req?.headers?.authorization

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../../config.js';
 import bcrypt from 'bcrypt';
 const generateToken = (id, email) => jwt.sign({ id: id, email: email }, config.APP_SECRET, {
-    expiresIn: '2d',
+    expiresIn: '7d',
 });
 const Mutation = {
     registerAgency: async (_parent, args, context) => {
@@ -50,6 +50,18 @@ const Mutation = {
             token: generateToken(agency.id, agency.email),
         };
         return authenticatedAgency;
+    },
+    createOrUpdateAgencyProfile: async (_parent, { input }, { db, agency }) => {
+        if (!agency)
+            throw new Error(`::: 🚫 No authenticated entity :::`);
+        const { bio } = input;
+        console.log('::: bio', bio && true || false);
+        const updatedAgencyProfile = await db.agencyProfile.upsert({
+            where: { agencyId: agency.id },
+            update: { bio },
+            create: { bio }
+        });
+        return updatedAgencyProfile;
     },
 };
 export { Mutation };

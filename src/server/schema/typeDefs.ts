@@ -1,14 +1,14 @@
 const typeDefs = `#graphql
     type Query {
-        getPets: [Pet!]!
-        getAgencies: [Agency!]!
-        getAgencyById(id: ID!): Agency!
-        getAgency: Agency!
+        getAgency: AgencyBase!
+        getAgencies: [Agency]!
+        getAgencyWithData: Agency!
     }
 
     type Mutation {
-        registerAgency(input: RegisterAgency!): Agency!
         loginAgency(input: LoginAgency!): Agency!
+        registerAgency(input: RegisterAgency!): Agency!
+        createOrUpdateAgencyProfile(input: CreateOrUpdateAgency!): AgencyProfile!
     }
 
     input RegisterAgency {
@@ -22,14 +22,16 @@ const typeDefs = `#graphql
         password: String!
     }
 
+    input CreateOrUpdateAgency {
+        bio: String
+    }
+
 
 
 
     # ::: address :::
     type Address { 
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         address: String!
         apartment: String
@@ -51,8 +53,6 @@ const typeDefs = `#graphql
     # ::: contact :::
     type Contact {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         phone: String
         email: String
@@ -70,8 +70,6 @@ const typeDefs = `#graphql
     # ::: agency :::
     type Agency {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         name: String!
         email: String!
@@ -83,10 +81,17 @@ const typeDefs = `#graphql
         volunteers: [User]!
     }
 
+    type AgencyBase {
+        id: ID!
+
+        name: String!
+        email: String!
+        password: String!
+        token: String
+    }
+
     type AgencyProfile {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         username: String!
         bio: String
@@ -104,8 +109,6 @@ const typeDefs = `#graphql
     # ::: user :::
     type User {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         username: String!
         email: String!
@@ -122,8 +125,6 @@ const typeDefs = `#graphql
 
     type UserProfile {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         firstName: String
         lastName: String
@@ -149,8 +150,6 @@ const typeDefs = `#graphql
     # ::: pet :::
     type Pet {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         name: String!
         species: [SpeciesToPets]
@@ -165,8 +164,6 @@ const typeDefs = `#graphql
 
     type PetProfile {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         age: Int
         bio: String
@@ -193,8 +190,6 @@ const typeDefs = `#graphql
     # ::: color :::
     type Color {
         id: ID!
-        createdAt: String
-        updatedAt: String
        
 
         color: String!
@@ -215,8 +210,6 @@ const typeDefs = `#graphql
     # ::: species :::
     type Species {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         species: String!
 
@@ -237,8 +230,6 @@ const typeDefs = `#graphql
     # ::: breed :::
     type Breed {
         id: ID!
-        createdAt: String
-        updatedAt: String
        
 
         breed: String!
@@ -259,8 +250,6 @@ const typeDefs = `#graphql
     # ::: image :::
     type Image {
         id: ID!
-        createdAt: String
-        updatedAt: String
 
         url: String
         file: String
