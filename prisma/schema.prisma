@@ -130,6 +130,24 @@ model Pet {
   updatedAt DateTime @updatedAt
 }
 
+model Breed {
+  id Int @id @default(autoincrement())
+
+  breed String
+  species Species
+
+  pets BreedsToPets[]
+}
+
+model BreedsToPets {
+  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  breedId Int
+  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petId   Int
+
+  @@id([breedId, petId])
+}
+
 enum Species {
   CAT
   DOG
@@ -217,23 +235,6 @@ enum GoodWith {
   ALL
 }
 
-model Breed {
-  id Int @id @default(autoincrement())
-
-  breed String @unique
-  species Species
-
-  pets BreedsToPets[]
-}
-
-model BreedsToPets {
-  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  breedId Int
-  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId   Int
-
-  @@id([breedId, petId])
-}
 
 model Image {
   id Int @id @default(autoincrement())
