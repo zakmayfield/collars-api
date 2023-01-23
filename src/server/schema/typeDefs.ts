@@ -1,8 +1,14 @@
 const typeDefs = `#graphql
     type Query {
-        getAgency: AgencyBase!
-        getAgencies: [Agency]!
-        getAgencyWithData: Agency!
+        # ::: BREEDS :::
+        breeds: [Breed!]!
+        dogBreeds: [Breed!]!
+        catBreeds: [Breed!]!
+        horseBreeds: [Breed!]!
+
+        agency: AgencyBase!
+        agencies: [Agency]!
+        agencyWithData: Agency!
     }
 
     type Mutation {

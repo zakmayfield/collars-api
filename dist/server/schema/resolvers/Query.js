@@ -1,6 +1,30 @@
 const Query = {
+    // BREEDS 
+    breeds: async (_parent, _args, { db, agency }) => {
+        const result = await db.breed.findMany();
+        return result;
+    },
+    dogBreeds: async (_parent, _args, { db, agency }) => {
+        const result = await db.breed.findMany({
+            where: { species: 'DOG' }
+        });
+        return result;
+    },
+    catBreeds: async (_parent, _args, { db, agency }) => {
+        const result = await db.breed.findMany({
+            where: { species: 'CAT' }
+        });
+        return result;
+    },
+    horseBreeds: async (_parent, _args, { db, agency }) => {
+        const result = await db.breed.findMany({
+            where: { species: 'HORSE' }
+        });
+        return result;
+    },
+    // AGENCY
     // GET agency with only base data // { id, name, email, token, password }
-    getAgency: async (_parent, _args, { db, agency }) => {
+    agency: async (_parent, _args, { db, agency }) => {
         if (!agency)
             throw new Error(`::: 🚫 No authenticated entity :::`);
         const { id } = agency;
@@ -10,7 +34,7 @@ const Query = {
         return result;
     },
     // GET agency w/ extra data // { ...agency, profile, pets, volunteers}
-    getAgencyWithData: async (_parent, _args, { db, agency }) => {
+    agencyWithData: async (_parent, _args, { db, agency }) => {
         if (!agency)
             throw new Error(`::: 🚫 No authenticated entity :::`);
         const { id } = agency;
@@ -26,32 +50,11 @@ const Query = {
         return result;
     },
     // GET all agencies with only base data // { id, name, email, token, password }
-    getAgencies: async (_parent, _args, { db, agency }) => {
+    agencies: async (_parent, _args, { db, agency }) => {
         if (!agency)
             throw new Error(`::: 🚫 No authenticated entity :::`);
         const agencies = await db.agency.findMany();
         return agencies;
     },
-    // getPets: async (_parent, args, context) => {
-    //   const pets = await context.db.pet.findMany({
-    //     include: {
-    //       species: {
-    //         include: {
-    //           species: true,
-    //         },
-    //       },
-    //       breed: {
-    //         include: {
-    //           breed: true,
-    //         },
-    //       },
-    //       profile: true,
-    //     },
-    //   });
-    //   if (!pets) {
-    //     throw new Error(`Server Error`);
-    //   }
-    //   return pets;
-    // },
 };
 export { Query };
