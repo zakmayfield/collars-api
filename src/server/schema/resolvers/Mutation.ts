@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 const generateToken = (id: number, email: string) =>
   jwt.sign({ id: id, email: email }, config.APP_SECRET, {
-    expiresIn: '7d',
+    expiresIn: '30d',
   });
 
 const Mutation = {
@@ -74,16 +74,69 @@ const Mutation = {
 
     const { bio } = input;
 
-    console.log('::: bio', bio && true || false)
+    console.log('::: bio', (bio && true) || false);
 
     const updatedAgencyProfile = await db.agencyProfile.upsert({
       where: { agencyId: agency.id },
       update: { bio },
-      create: { bio  }
+      create: { bio },
     });
 
-    return updatedAgencyProfile
+    return updatedAgencyProfile;
   },
+
+  createPet: async (_parent, { input }, { db, agency }) => {
+    const { name, species } = input;
+
+    const pet = await db.pet.create({
+      data: {
+        name: name,
+        species: species,
+        agencyId: agency.id,
+      },
+    });
+
+    return pet;
+  },
+
+  addBreedToPet: async(_parent, { input }, { db, agency }) => {
+    const { breedId, petId } = input
+
+    const pet = await db.pet.findUnique({
+      where: { id: petId }
+    })
+
+    const breed =  await db.breed.findUnique({
+      where: { id: breedId }
+    })
+
+    console.log(`::: pet :::`, pet)
+    console.log(`::: breed :::`, breed)
+
+    if (pet.species !== breed.species) {
+      throw new Error (`🚫 Cannot add this breed to current species.`)
+    }
+
+    await db.breedsToPets.create({
+      data: {
+        breedId: breedId,
+        petId: petId
+      }
+    })
+
+    const updatedPet = await db.pet.findUnique({
+      where: { id: petId },
+      include: {
+        breed: {
+          include: {
+            breed: true
+          }
+        },
+      }
+    })
+
+    return updatedPet
+  }
 };
 
 export { Mutation };

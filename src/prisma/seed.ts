@@ -19,15 +19,15 @@ async function createBreed(breed: string, species: Species) {
 
 async function breedCreator() {
   let dog = dogBreeds.map(async (breed) => {
-    await createBreed(breed, Species.DOG);
+    await createBreed(breed.toLowerCase(), Species.DOG);
   });
 
   let cat = catBreeds.map(async (breed) => {
-    await createBreed(breed, Species.CAT);
+    await createBreed(breed.toLowerCase(), Species.CAT);
   });
 
   let horse = horseBreeds.map(async (breed) => {
-    await createBreed(breed, Species.HORSE);
+    await createBreed(breed.toLowerCase(), Species.HORSE);
   });
 
   return {

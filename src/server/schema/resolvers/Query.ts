@@ -27,8 +27,32 @@ const Query = {
     return result
   },
 
+  // PET
+  pet: async  (_parent, { id }, { db, agency }) => {
+    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    const result = await db.pet.findUnique({
+      where: { id: Number(id) },
+      include: {
+        breed: {
+          include: {
+            breed: true
+          }
+        },
+        savedBy: true,
+        profile: true,
+        agency: true,
+      }
+    });
+
+    if (!result) {
+      throw new Error(`🚫 Couldn't locate pet.`)
+    }
+
+    return result
+  },
+
   // AGENCY
-  // GET agency with only base data // { id, name, email, token, password }
   agency: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 
@@ -40,7 +64,6 @@ const Query = {
 
     return result;
   },
-  // GET agency w/ extra data // { ...agency, profile, pets, volunteers}
   agencyWithData: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 
@@ -59,7 +82,6 @@ const Query = {
 
     return result;
   },
-  // GET all agencies with only base data // { id, name, email, token, password }
   agencies: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 

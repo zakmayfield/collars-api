@@ -1,10 +1,13 @@
 const typeDefs = `#graphql
     type Query {
-        # ::: BREEDS :::
+        # ::: BREED :::
         breeds: [Breed!]!
         dogBreeds: [Breed!]!
         catBreeds: [Breed!]!
         horseBreeds: [Breed!]!
+
+        # ::: PET :::
+        pet(id: ID!): Pet!
 
         agency: AgencyBase!
         agencies: [Agency]!
@@ -15,6 +18,10 @@ const typeDefs = `#graphql
         loginAgency(input: LoginAgency!): Agency!
         registerAgency(input: RegisterAgency!): Agency!
         createOrUpdateAgencyProfile(input: CreateOrUpdateAgency!): AgencyProfile!
+
+        # ::: PET :::
+        createPet(input: CreatePet!): Pet!
+        addBreedToPet(input: BreedToPet!): Pet!
     }
 
     input RegisterAgency {
@@ -30,6 +37,16 @@ const typeDefs = `#graphql
 
     input CreateOrUpdateAgency {
         bio: String
+    }
+
+    input CreatePet {
+        name: String,
+        species: Species
+    }
+
+    input BreedToPet {
+        breedId: Int!
+        petId: Int!
     }
 
 
