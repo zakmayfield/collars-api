@@ -7,14 +7,18 @@ const typeDefs = `#graphql
         horseBreeds: [Breed!]!
 
         # ::: PET :::
-        pet(id: ID!): Pet!
+        pets: [Pet]!
+        petById(id: ID!): Pet!
+        petsByAgency: [Pet]!
 
-        agency: AgencyBase!
+        # ::: AGENCY :::
         agencies: [Agency]!
-        agencyWithData: Agency!
+        agencyById: AgencyBase!
+        agencyByIdWithData: Agency!
     }
 
     type Mutation {
+        # ::: AGENCY :::
         loginAgency(input: LoginAgency!): Agency!
         registerAgency(input: RegisterAgency!): Agency!
         createOrUpdateAgencyProfile(input: CreateOrUpdateAgency!): AgencyProfile!

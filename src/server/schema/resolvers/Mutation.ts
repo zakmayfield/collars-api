@@ -74,12 +74,10 @@ const Mutation = {
 
     const { bio } = input;
 
-    console.log('::: bio', (bio && true) || false);
-
     const updatedAgencyProfile = await db.agencyProfile.upsert({
       where: { agencyId: agency.id },
-      update: { bio },
-      create: { bio },
+      update: { bio: bio },
+      create: { bio: bio, agencyId: agency.id },
     });
 
     return updatedAgencyProfile;
@@ -99,44 +97,44 @@ const Mutation = {
     return pet;
   },
 
-  addBreedToPet: async(_parent, { input }, { db, agency }) => {
-    const { breedId, petId } = input
+  addBreedToPet: async (_parent, { input }, { db, agency }) => {
+    const { breedId, petId } = input;
 
     const pet = await db.pet.findUnique({
-      where: { id: petId }
-    })
+      where: { id: petId },
+    });
 
-    const breed =  await db.breed.findUnique({
-      where: { id: breedId }
-    })
+    const breed = await db.breed.findUnique({
+      where: { id: breedId },
+    });
 
-    console.log(`::: pet :::`, pet)
-    console.log(`::: breed :::`, breed)
+    console.log(`::: pet :::`, pet);
+    console.log(`::: breed :::`, breed);
 
     if (pet.species !== breed.species) {
-      throw new Error (`🚫 Cannot add this breed to current species.`)
+      throw new Error(`🚫 Cannot add this breed to current species.`);
     }
 
     await db.breedsToPets.create({
       data: {
         breedId: breedId,
-        petId: petId
-      }
-    })
+        petId: petId,
+      },
+    });
 
     const updatedPet = await db.pet.findUnique({
       where: { id: petId },
       include: {
         breed: {
           include: {
-            breed: true
-          }
+            breed: true,
+          },
         },
-      }
-    })
+      },
+    });
 
-    return updatedPet
-  }
+    return updatedPet;
+  },
 };
 
 export { Mutation };
