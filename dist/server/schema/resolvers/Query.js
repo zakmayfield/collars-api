@@ -71,11 +71,10 @@ const Query = {
         return agencies;
     },
     agencyById: async (_parent, _args, { db, agency }) => {
-        if (!agency)
-            throw new Error(`::: 🚫 No authenticated entity :::`);
-        const { id } = agency;
+        // if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+        // const { id } = agency;
         const result = await db.agency.findUnique({
-            where: { id },
+            where: { id: 1 },
         });
         return result;
     },

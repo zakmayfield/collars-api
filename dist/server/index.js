@@ -22,15 +22,17 @@ app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(serve
     context: async ({ req }) => {
         const db = prisma;
         // let agency: AgencyContext = {
-        //     id: 1,
-        //     email: 'pawsandclaws@gmail.com',
-        //     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJwYXdzYW5kY2xhd3NAZ21haWwuY29tIiwiaWF0IjoxNjczNzI3ODU5LCJleHAiOjE2NzM5MDA2NTl9.aLqXWpro7j1B0q5-OAvn8AuaRCY6YOgDfbu8_nZekAA'
-        // }
+        //   id: 1,
+        //   email: 'agency-1@email.com',
+        //   token:
+        //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZ2VuY3ktMUBlbWFpbC5jb20iLCJpYXQiOjE2NzQ3NDYyNDMsImV4cCI6MTY3NzMzODI0M30.hqLpAdqZWuNKz3oo0FnI4Hk0OwPCbFnbLPsM89KPlWE',
+        // };
         let agency = null;
-        let user = null;
+        // let user: UserContext = null;
         let token = req?.headers?.authorization
             ? req?.headers?.authorization.split(' ')[1]
             : '';
+        console.log('::: token ctx :::', token);
         if (token) {
             if (token.includes('"')) {
                 token = token.split('"')[0];
