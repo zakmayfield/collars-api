@@ -1,14 +1,31 @@
 const typeDefs = `#graphql
     type Query {
-        getAgency: AgencyBase!
-        getAgencies: [Agency]!
-        getAgencyWithData: Agency!
+        # ::: BREED :::
+        breeds: [Breed!]!
+        dogBreeds: [Breed!]!
+        catBreeds: [Breed!]!
+        horseBreeds: [Breed!]!
+
+        # ::: PET :::
+        pets: [Pet]!
+        petById(id: ID!): Pet!
+        petsByAgency: [Pet]!
+
+        # ::: AGENCY :::
+        agencies: [Agency]!
+        agencyById: AgencyBase!
+        agencyByIdWithData: Agency!
     }
 
     type Mutation {
+        # ::: AGENCY :::
         loginAgency(input: LoginAgency!): Agency!
         registerAgency(input: RegisterAgency!): Agency!
         createOrUpdateAgencyProfile(input: CreateOrUpdateAgency!): AgencyProfile!
+
+        # ::: PET :::
+        createPet(input: CreatePet!): Pet!
+        addBreedToPet(input: BreedToPet!): Pet!
     }
 
     input RegisterAgency {
@@ -24,6 +41,16 @@ const typeDefs = `#graphql
 
     input CreateOrUpdateAgency {
         bio: String
+    }
+
+    input CreatePet {
+        name: String,
+        species: Species
+    }
+
+    input BreedToPet {
+        breedId: Int!
+        petId: Int!
     }
 
 
@@ -266,8 +293,8 @@ const typeDefs = `#graphql
     type Breed {
         id: ID!
        
-
         breed: String!
+        species: Species!
 
         pets: [BreedsToPets]
     }

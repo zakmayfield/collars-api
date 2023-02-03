@@ -117,6 +117,23 @@ CREATE TABLE "Pet" (
 );
 
 -- CreateTable
+CREATE TABLE "Breed" (
+    "id" SERIAL NOT NULL,
+    "breed" TEXT NOT NULL,
+    "species" "Species" NOT NULL,
+
+    CONSTRAINT "Breed_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BreedsToPets" (
+    "breedId" INTEGER NOT NULL,
+    "petId" INTEGER NOT NULL,
+
+    CONSTRAINT "BreedsToPets_pkey" PRIMARY KEY ("breedId","petId")
+);
+
+-- CreateTable
 CREATE TABLE "PetProfile" (
     "id" SERIAL NOT NULL,
     "age" INTEGER,
@@ -137,22 +154,6 @@ CREATE TABLE "PetProfile" (
     "petId" INTEGER NOT NULL,
 
     CONSTRAINT "PetProfile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Breed" (
-    "id" SERIAL NOT NULL,
-    "breed" TEXT NOT NULL,
-
-    CONSTRAINT "Breed_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "BreedsToPets" (
-    "breedId" INTEGER NOT NULL,
-    "petId" INTEGER NOT NULL,
-
-    CONSTRAINT "BreedsToPets_pkey" PRIMARY KEY ("breedId","petId")
 );
 
 -- CreateTable
@@ -200,9 +201,6 @@ CREATE UNIQUE INDEX "UserProfile_userId_key" ON "UserProfile"("userId");
 -- CreateIndex
 CREATE UNIQUE INDEX "PetProfile_petId_key" ON "PetProfile"("petId");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Breed_breed_key" ON "Breed"("breed");
-
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_agencyProfileId_fkey" FOREIGN KEY ("agencyProfileId") REFERENCES "AgencyProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -234,13 +232,13 @@ ALTER TABLE "UsersToPets" ADD CONSTRAINT "UsersToPets_petId_fkey" FOREIGN KEY ("
 ALTER TABLE "Pet" ADD CONSTRAINT "Pet_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "Agency"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PetProfile" ADD CONSTRAINT "PetProfile_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "BreedsToPets" ADD CONSTRAINT "BreedsToPets_breedId_fkey" FOREIGN KEY ("breedId") REFERENCES "Breed"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BreedsToPets" ADD CONSTRAINT "BreedsToPets_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PetProfile" ADD CONSTRAINT "PetProfile_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ImagesToPetProfiles" ADD CONSTRAINT "ImagesToPetProfiles_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;

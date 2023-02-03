@@ -1,19 +1,98 @@
 const Query = {
-  // GET agency with only base data // { id, name, email, token, password }
-  getAgency: async (_parent, _args, { db, agency }) => {
-    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+  // BREEDS
+  breeds: async (_parent, _args, { db }) => {
+    const result = await db.breed.findMany();
 
-    const { id } = agency;
+    return result;
+  },
+  dogBreeds: async (_parent, _args, { db }) => {
+    const result = await db.breed.findMany({
+      where: { species: 'DOG' },
+    });
 
-    const result = await db.agency.findUnique({
-      where: { id },
+    return result;
+  },
+  catBreeds: async (_parent, _args, { db }) => {
+    const result = await db.breed.findMany({
+      where: { species: 'CAT' },
+    });
+
+    return result;
+  },
+  horseBreeds: async (_parent, _args, { db }) => {
+    const result = await db.breed.findMany({
+      where: { species: 'HORSE' },
     });
 
     return result;
   },
 
-  // GET agency w/ extra data // { ...agency, profile, pets, volunteers}
-  getAgencyWithData: async (_parent, _args, { db, agency }) => {
+  // PET
+  pets: async (_parent, _args, { db }) => {
+    const result = await db.pet.findMany();
+
+    return result;
+  },
+  petById: async (_parent, { id }, { db, agency }) => {
+    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    const result = await db.pet.findUnique({
+      where: { id: Number(id) },
+      include: {
+        breed: {
+          include: {
+            breed: true,
+          },
+        },
+        savedBy: true,
+        profile: true,
+        agency: true,
+      },
+    });
+
+    if (!result) {
+      throw new Error(`🚫 Couldn't locate pet.`);
+    }
+
+    return result;
+  },
+  petsByAgency: async (_parent, _args, { db, agency }) => {
+    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    const result = await db.pet.findMany({
+      where: { agencyId: agency.id },
+      include: {
+        breed: {
+          include: {
+            breed: true,
+          },
+        },
+      },
+    });
+
+    return result;
+  },
+
+  // AGENCY
+  agencies: async (_parent, _args, { db, agency }) => {
+    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    const agencies = await db.agency.findMany();
+
+    return agencies;
+  },
+  agencyById: async (_parent, _args, { db, agency }) => {
+    // if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
+
+    // const { id } = agency;
+
+    const result = await db.agency.findUnique({
+      where: { id: 1 },
+    });
+
+    return result;
+  },
+  agencyByIdWithData: async (_parent, _args, { db, agency }) => {
     if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
 
     const { id } = agency;
@@ -27,43 +106,8 @@ const Query = {
       },
     });
 
-    console.log(`::: result from getAgencyQuery :::`, result);
-
     return result;
   },
-
-  // GET all agencies with only base data // { id, name, email, token, password }
-  getAgencies: async (_parent, _args, { db, agency }) => {
-    if (!agency) throw new Error(`::: 🚫 No authenticated entity :::`);
-
-    const agencies = await db.agency.findMany();
-
-    return agencies;
-  },
-
-  // getPets: async (_parent, args, context) => {
-  //   const pets = await context.db.pet.findMany({
-  //     include: {
-  //       species: {
-  //         include: {
-  //           species: true,
-  //         },
-  //       },
-  //       breed: {
-  //         include: {
-  //           breed: true,
-  //         },
-  //       },
-  //       profile: true,
-  //     },
-  //   });
-
-  //   if (!pets) {
-  //     throw new Error(`Server Error`);
-  //   }
-
-  //   return pets;
-  // },
 };
 
 export { Query };

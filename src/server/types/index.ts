@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
 interface ContextReturn {
-  req: any;
   db: PrismaClient;
   agency?: AgencyContext | null;
   user?: UserContext | null;
