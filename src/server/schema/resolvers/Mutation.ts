@@ -49,6 +49,10 @@ const Mutation = {
   loginAgency: async (_parent, args, context) => {
     const { email, password } = args.input;
 
+    if (!email || !password) {
+      throw new Error(`🚫 Credentials must be provided`);
+    }
+
     const agency = await context.db.agency.findUnique({
       where: { email },
     });

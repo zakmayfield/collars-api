@@ -20,23 +20,23 @@ const server = new ApolloServer({
 await server.start();
 app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(server, {
     context: async ({ req }) => {
-        const db = prisma;
-        // let agency: AgencyContext = {
+        // let agency: AgencyContext = { // for testing
         //   id: 1,
         //   email: 'agency-1@email.com',
         //   token:
         //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZ2VuY3ktMUBlbWFpbC5jb20iLCJpYXQiOjE2NzQ3NDYyNDMsImV4cCI6MTY3NzMzODI0M30.hqLpAdqZWuNKz3oo0FnI4Hk0OwPCbFnbLPsM89KPlWE',
         // };
+        const db = prisma;
         let agency = null;
-        // let user: UserContext = null;
         let token = req?.headers?.authorization
             ? req?.headers?.authorization.split(' ')[1]
             : '';
-        console.log('::: token ctx :::', token);
         if (token) {
-            if (token.includes('"')) {
-                token = token.split('"')[0];
-            }
+            // if (token.includes('"')) { 
+            //   // safeguarding against a strange bug that adds a " to the end of the token
+            //   token = token.split('"')[0];
+            // }
+            // console.log('::: token ctx :::', token);
             const { id, email } = jwt.verify(token, config.APP_SECRET);
             agency = {
                 id,
@@ -44,9 +44,7 @@ app.use('/', cors(), bodyParser.json({ limit: '50mb' }), expressMiddleware(serve
                 token,
             };
         }
-        // console.log('::: agency ctx :::', agency);
         return {
-            req,
             db,
             agency,
         };

@@ -6,11 +6,10 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken'
-import { resolvers, typeDefs } from './schema/index.js'
+import jwt from 'jsonwebtoken';
+import { resolvers, typeDefs } from './schema/index.js';
 import { config } from './config.js';
-import { ContextReturn, AgencyContext, UserContext } from './types/index.js'
-
+import { ContextReturn, AgencyContext } from './types/index.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -30,44 +29,41 @@ app.use(
   bodyParser.json({ limit: '50mb' }),
   expressMiddleware(server, {
     context: async ({ req }) => {
-          const db = prisma;
-          // let agency: AgencyContext = {
-          //   id: 1,
-          //   email: 'agency-1@email.com',
-          //   token:
-          //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZ2VuY3ktMUBlbWFpbC5jb20iLCJpYXQiOjE2NzQ3NDYyNDMsImV4cCI6MTY3NzMzODI0M30.hqLpAdqZWuNKz3oo0FnI4Hk0OwPCbFnbLPsM89KPlWE',
-          // };
+      // let agency: AgencyContext = { // for testing
+      //   id: 1,
+      //   email: 'agency-1@email.com',
+      //   token:
+      //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZ2VuY3ktMUBlbWFpbC5jb20iLCJpYXQiOjE2NzQ3NDYyNDMsImV4cCI6MTY3NzMzODI0M30.hqLpAdqZWuNKz3oo0FnI4Hk0OwPCbFnbLPsM89KPlWE',
+      // };
 
-          let agency: AgencyContext = null;
-          // let user: UserContext = null;
+      const db = prisma;
+      let agency: AgencyContext = null;
 
-          let token: string = req?.headers?.authorization
-            ? req?.headers?.authorization.split(' ')[1]
-            : '';
+      let token: string = req?.headers?.authorization
+        ? req?.headers?.authorization.split(' ')[1]
+        : '';
 
-          console.log('::: token ctx :::', token);
+      if (token) {
+        // if (token.includes('"')) { 
+        //   // safeguarding against a strange bug that adds a " to the end of the token
+        //   token = token.split('"')[0];
+        // }
 
-          if (token) {
-            if (token.includes('"')) {
-              token = token.split('"')[0];
-            }
+        // console.log('::: token ctx :::', token);
 
-            const { id, email } = jwt.verify(token, config.APP_SECRET);
+        const { id, email } = jwt.verify(token, config.APP_SECRET);
 
-            agency = {
-              id,
-              email,
-              token,
-            };
-          }
+        agency = {
+          id,
+          email,
+          token,
+        };
+      }
 
-          // console.log('::: agency ctx :::', agency);
-
-          return {
-            req,
-            db,
-            agency, 
-          };
+      return {
+        db,
+        agency,
+      };
     },
   })
 );
