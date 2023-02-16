@@ -17,9 +17,33 @@ export const typeDefs = /* GraphQL */ `
     # deleteLink(id: Int!): Link!
     # updateLink(id: Int!, description: String, url: String): Link!
 
-    signUp(name: String!, email: String!, password: String!, type: String!): AuthPayload
+    signUp(
+      name: String!
+      email: String!
+      password: String!
+      type: String!
+    ): AuthPayload
     # login(email: String!, password: String!): AuthPayload
     # deleteUserAccount(password: String!): User
+  }
+
+  type Address {
+    id: ID!
+    address: String! 
+    apartment: String 
+    city: String! 
+    state: String! 
+    zip: Int! 
+    country:  String!
+    userProfile: UserProfile
+    volunteer: [Volunteer]
+  }
+
+  type Contact {
+    id: ID!
+    phone: String
+    email: String
+    userProfile: UserProfile
   }
 
   type AuthPayload {
@@ -40,16 +64,24 @@ export const typeDefs = /* GraphQL */ `
     email: String!
     type: String!
     profile: UserProfile
-    pets: Pet[]
-    savedPets: UsersToPets[]
-    volunteers: Volunteer[]
+    pets: [Pet]
+    savedPets: [UsersToPets]
+    volunteers: [Volunteer]
   }
 
-  # enum AccountType {
-  #   DEFAULT
-  #   VOLUNTEER
-  #   AGENCY
-  # }
+  type UserProfile {
+    id: ID!
+    bio: String
+    address: [Address]
+    contact: [Contact]
+    user: User
+  }
+
+  enum AccountType {
+    DEFAULT
+    VOLUNTEER
+    AGENCY
+  }
 
   type Volunteer {
     id: ID!
@@ -68,26 +100,33 @@ export const typeDefs = /* GraphQL */ `
   type Pet {
     id: ID!
     name: String!
-    species: String!
-    breed: BreedsToPets[]
-    savedBy: UsersToPets[]
-    profile: PetProfile?
+    species: Species!
+    breed: [BreedsToPets]
+    savedBy: [UsersToPets]
+    profile: PetProfile
     agency: User
   }
 
-  # enum Species {
-  #   CAT 
-  #   DOG
-  #   BIRD
-  #   HORSE
-  #   FISH
-  #   REPTILE
-  #   BARNYARD
-  # }
+  enum Species {
+    CAT
+    DOG
+    BIRD
+    HORSE
+    FISH
+    REPTILE
+    BARNYARD
+  }
 
   type BreedsToPets {
     breed: Breed
     pet: Pet
+  }
+
+  type Breed {
+    id: ID!
+    breed: String!
+    species: Species!
+    pets: [BreedsToPets]
   }
 
   type PetProfile {
@@ -102,14 +141,14 @@ export const typeDefs = /* GraphQL */ `
     isHouseTrained: Boolean
     isVaccineCurrent: Boolean
 
-    sex: String
-    coat: String 
-    diet: String
-    color: String
-    goodWith: String
-    personality: String
+    sex: Sex
+    coat: Coat
+    diet: Diet
+    color: Color
+    goodWith: GoodWith
+    personality: Personality
 
-    images: ImagesToPetProfiles[]
+    images: [ImagesToPetProfiles]
     pet: Pet
   }
 
@@ -124,55 +163,55 @@ export const typeDefs = /* GraphQL */ `
     file: String
     thumbnail: String
 
-    pets: ImagesToPetProfiles[]
+    pets: [ImagesToPetProfiles]
   }
 
-  # enum Sex {
-  #   UNKNOWN
-  #   FEMALE
-  #   MALE
-  # }
+  enum Sex {
+    UNKNOWN
+    FEMALE
+    MALE
+  }
 
-  # enum Color {
-  #   UNKNOWN
-  #   BLACK
-  #   WHITE
-  #   BROWN
-  #   GOLDEN
-  #   SPOTTED
-  #   BRINDLE
-  # }
+  enum Color {
+    UNKNOWN
+    BLACK
+    WHITE
+    BROWN
+    GOLDEN
+    SPOTTED
+    BRINDLE
+  }
 
-  # enum Personality {
-  #   UNKNOWN
-  #   ACTIVE
-  #   CURIOUS
-  #   GOOFY
-  #   HYPER
-  #   LAZY
-  #   LONER
-  # }
+  enum Personality {
+    UNKNOWN
+    ACTIVE
+    CURIOUS
+    GOOFY
+    HYPER
+    LAZY
+    LONER
+  }
 
-  # enum Diet {
-  #   STANDARD
-  #   MEDICAL
-  #   WEIGHT
-  # }
+  enum Diet {
+    STANDARD
+    MEDICAL
+    WEIGHT
+  }
 
-  # enum Coat {
-  #   UNKNOWN
-  #   SHORT
-  #   MEDIUM
-  #   LONG
-  #   NONE
-  # }
+  enum Coat {
+    UNKNOWN
+    SHORT
+    MEDIUM
+    LONG
+    NONE
+  }
 
-  # enum GoodWith {
-  #   UNKNOWN
-  #   CATS
-  #   DOGS
-  #   CHILDREN
-  #   CATS_AND_DOGS
-  #   ALL
-  # }
+  enum GoodWith {
+    UNKNOWN
+    CATS
+    DOGS
+    CHILDREN
+    CATS_AND_DOGS
+    ALL
+  }
 `;
