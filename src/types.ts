@@ -5,10 +5,12 @@ export type ServerContext = {
   prisma: PrismaClient;
   user: SecureUser | null
 };
+
 export type SecureUser = {
   id: number;
   name: string;
   email: string;
+  type: string;
 };
 
 export type ContextProps = {
@@ -21,7 +23,15 @@ export interface SignupArgs {
   name: string;
   email: string;
   password: string;
+  type: AccountType;
 }
+
+export enum AccountType {
+  DEFAULT = 'DEFAULT',
+  VOLUNTEER = 'VOLUNTEER',
+  AGENCY = 'AGENCY'
+}
+
 export interface LoginArgs {
   email: string;
   password: string;

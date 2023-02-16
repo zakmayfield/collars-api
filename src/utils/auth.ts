@@ -9,7 +9,7 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
     : '';
 
   if (!token) return null
-
+  
   const verifiedToken = verify(token, APP_SECRET) as JwtPayload;
 
   if (!verifiedToken) return null
@@ -23,6 +23,7 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
       id: true,
       name: true,
       email: true,
+      type: true
     },
   });
 

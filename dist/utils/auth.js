@@ -17,6 +17,7 @@ export async function authenticateUser(prisma, req) {
             id: true,
             name: true,
             email: true,
+            type: true
         },
     });
     console.log('::: authenticate ::: USER :::', {
