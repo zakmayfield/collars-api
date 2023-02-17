@@ -8,33 +8,28 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Mutation {
-    ## prevent post link if user has a link with the same title
-    # postLink(description: String!, url: String!): Link
-    # postCommentOnLink(linkId: Int!, body: String!): Comment
-    # deleteCommentOnLink(commentId: Int!): Comment
-    # updateCommentOnLink(commentId: Int!, body: String!): Comment
-
-    # deleteLink(id: Int!): Link!
-    # updateLink(id: Int!, description: String, url: String): Link!
-
     signUp(
       name: String!
       email: String!
       password: String!
       type: String!
     ): AuthPayload
-    # login(email: String!, password: String!): AuthPayload
-    # deleteUserAccount(password: String!): User
+    login(email: String!, password: String!): AuthPayload
+    deleteUserAccount(password: String!): User
+    updateUserAccount(
+      type: String
+    ): User
+    postPet(name: String!, species: Species!): Pet
   }
 
   type Address {
     id: ID!
-    address: String! 
-    apartment: String 
-    city: String! 
-    state: String! 
-    zip: Int! 
-    country:  String!
+    address: String!
+    apartment: String
+    city: String!
+    state: String!
+    zip: Int!
+    country: String!
     userProfile: UserProfile
     volunteer: [Volunteer]
   }

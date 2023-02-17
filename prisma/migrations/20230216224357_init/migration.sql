@@ -84,7 +84,7 @@ CREATE TABLE "Pet" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "species" "Species" NOT NULL,
-    "agencyId" INTEGER NOT NULL,
+    "agencyId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -108,7 +108,7 @@ CREATE TABLE "PetProfile" (
     "birthday" VARCHAR(128),
     "isFixed" BOOLEAN,
     "isAdopted" BOOLEAN NOT NULL DEFAULT false,
-    "isAvailable" BOOLEAN NOT NULL,
+    "isAvailable" BOOLEAN NOT NULL DEFAULT false,
     "isHouseTrained" BOOLEAN,
     "isVaccineCurrent" BOOLEAN,
     "sex" "Sex" DEFAULT 'UNKNOWN',

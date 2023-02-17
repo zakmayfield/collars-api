@@ -17,10 +17,19 @@ export const resolvers = {
                     name: true,
                     email: true,
                     type: true,
-                    // profile: true,
-                    // pets: true,
-                    // savedPets: true,
-                    // volunteers: true
+                    profile: true,
+                    savedPets: true,
+                    volunteers: true,
+                    pets: {
+                        include: {
+                            breed: {
+                                include: {
+                                    breed: true,
+                                    pet: true,
+                                },
+                            },
+                        },
+                    },
                 },
             });
             if (!userData)
@@ -34,7 +43,7 @@ export const resolvers = {
         //   context: ServerContext
         // ) => {
         //   // // i can now authenticate an operation by adding this guard, i can probably extrapolate this to its own middleware
-        //   // if (!context.user) 
+        //   // if (!context.user)
         //   //   return Promise.reject(
         //   //     new GraphQLError(`🚫 Please login to view this data.`)
         //   //   );
@@ -160,78 +169,87 @@ export const resolvers = {
             const user = await context.prisma.user.create({
                 data: {
                     ...args,
-                    password: hashedPassword
-                }
+                    password: hashedPassword,
+                },
             });
             const token = jwt.sign({ userId: user.id }, APP_SECRET);
             return { token, user };
         },
-        // login: async (parent: unknown, args: LoginArgs, context: ServerContext) => {
-        //   // validate args
-        //   const { email, password } = args;
-        //   if (!email || !password) {
-        //     return Promise.reject(new GraphQLError(`🚫 All fields are required.`));
-        //   }
-        //   // query requested user
-        //   const user = await context.prisma.user.findUnique({ where: { email } });
-        //   if (!user) {
-        //     return Promise.reject(
-        //       new GraphQLError(`🚫 That user doesn't seem to exist.`)
-        //     );
-        //   }
-        //   // validate the password
-        //   const validPassword = await bcrypt.compare(
-        //     args.password,
-        //     user.password
-        //   );
-        //   if (!validPassword) {
-        //     return Promise.reject(new GraphQLError(`🚫 Incorrect credentials.`));
-        //   }
-        //   // generate a token
-        //   const token = jwt.sign({ userId: user.id }, APP_SECRET);
-        //   return { user, token };
-        // },
-        // deleteUserAccount: async (
-        //   parent: unknown,
-        //   args: DeleteUserAccountArgs,
-        //   context: ServerContext
-        // ) => {
-        //   const { user } = context;
-        //   if (!user) {
-        //     return Promise.reject(
-        //       new GraphQLError(`🚫 Please login to perform this action.`)
-        //     );
-        //   }
-        //   // validate args
-        //   const { password } = args;
-        //   if (!password) {
-        //     return Promise.reject(
-        //       new GraphQLError(`🚫 Password is required to delete account.`)
-        //     );
-        //   }
-        //   // query requested user
-        //   const userData = await context.prisma.user.findUnique({
-        //     where: { id: user.id },
-        //   });
-        //   if (!userData) {
-        //     return Promise.reject(
-        //       new GraphQLError(`🚫 That user doesn't seem to exist.`)
-        //     );
-        //   }
-        //   // validate the password
-        //   const passwordIsValid = await bcrypt.compare(
-        //     args.password,
-        //     userData.password
-        //   );
-        //   if (!passwordIsValid) {
-        //     return Promise.reject(new GraphQLError(`🚫 Incorrect credentials.`));
-        //   }
-        //   // delete user
-        //   const deletedUser = await context.prisma.user.delete({
-        //     where: { id: user.id },
-        //   });
-        //   return deletedUser;
-        // },
+        login: async (parent, args, context) => {
+            // validate args
+            const { email, password } = args;
+            if (!email || !password) {
+                return Promise.reject(new GraphQLError(`🚫 All fields are required.`));
+            }
+            // query requested user
+            const user = await context.prisma.user.findUnique({ where: { email } });
+            if (!user) {
+                return Promise.reject(new GraphQLError(`🚫 That user doesn't seem to exist.`));
+            }
+            // validate the password
+            const validPassword = await bcrypt.compare(args.password, user.password);
+            if (!validPassword) {
+                return Promise.reject(new GraphQLError(`🚫 Incorrect credentials.`));
+            }
+            // generate a token
+            const token = jwt.sign({ userId: user.id }, APP_SECRET);
+            return { user, token };
+        },
+        deleteUserAccount: async (parent, args, context) => {
+            const { user } = context;
+            if (!user)
+                return Promise.reject(new GraphQLError(`🚫 Please login to perform this action.`));
+            // validate args
+            const { password } = args;
+            if (!password)
+                return Promise.reject(new GraphQLError(`🚫 Password is required to delete account.`));
+            // query requested user
+            const userData = await context.prisma.user.findUnique({
+                where: { id: user.id },
+            });
+            if (!userData)
+                Promise.reject(new GraphQLError(`🚫 That user doesn't seem to exist`));
+            // validate the password
+            const passwordIsValid = await bcrypt.compare(args.password, userData.password);
+            if (!passwordIsValid)
+                return Promise.reject(new GraphQLError(`🚫 Incorrect credentials.`));
+            // delete user
+            const deletedUser = await context.prisma.user.delete({
+                where: { id: user.id },
+            });
+            return deletedUser;
+        },
+        updateUserAccount: async (parent, args, context) => {
+            const { user } = context;
+            if (!user)
+                return Promise.reject(new GraphQLError(`🚫 Please login to perform this action.`));
+            const { type } = args;
+            const updatedUser = await context.prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    ...args
+                }
+            });
+        },
+        // ::: Pet :::
+        postPet: async (parent, args, context) => {
+            const { user } = context;
+            if (!user)
+                Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
+            if (user.type !== 'AGENCY')
+                Promise.reject(new GraphQLError(`🚫 This user does not have the proper authorization to do this.`));
+            const { name, species } = args;
+            if (!name || !species)
+                Promise.reject(new GraphQLError(`🚫 Name and species are required fields when creating a pet.`));
+            const newPet = await context.prisma.pet.create({
+                data: {
+                    name,
+                    species,
+                    agencyId: user.id,
+                },
+            });
+            return newPet;
+        },
         // // ::: Link :::
         // postLink: async (
         //   parent: unknown,
