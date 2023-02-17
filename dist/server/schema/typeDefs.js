@@ -1,6 +1,8 @@
 export const typeDefs = /* GraphQL */ `
   type Query {
     getUser: User!
+    getBreeds(filterNeedle: String, skip: Int, take: Int): [Breed!]!
+    petFeed(filterNeedle: String, skip: Int, take: Int): [Pet]!
     # linkFeed(filterNeedle: String, take: Int, skip: Int): [Link]!
     # link(id: Int!): Link
     # comment(id: Int!): Comment
@@ -11,6 +13,7 @@ export const typeDefs = /* GraphQL */ `
     signUp(
       name: String!
       email: String!
+      username: String
       password: String!
       type: String!
     ): AuthPayload
@@ -19,6 +22,7 @@ export const typeDefs = /* GraphQL */ `
     updateUserAccount(type: String): User
     postPet(name: String!, species: Species!): Pet
     deletePet(id: String!): Pet
+    addBreedToPet(petId: String!, breedId: String!): Pet
   }
 
   type Address {
@@ -49,6 +53,7 @@ export const typeDefs = /* GraphQL */ `
     id: String!
     name: String!
     email: String!
+    username: String
     type: String!
   }
 
@@ -56,6 +61,7 @@ export const typeDefs = /* GraphQL */ `
     id: String!
     name: String!
     email: String!
+    username: String
     type: String!
     profile: UserProfile
     pets: [Pet]

@@ -93,11 +93,11 @@ CREATE TABLE "Pet" (
 );
 
 -- CreateTable
-CREATE TABLE "UsersToPets" (
+CREATE TABLE "SavedPetRecord" (
     "userId" TEXT NOT NULL,
     "petId" TEXT NOT NULL,
 
-    CONSTRAINT "UsersToPets_pkey" PRIMARY KEY ("userId","petId")
+    CONSTRAINT "SavedPetRecord_pkey" PRIMARY KEY ("userId","petId")
 );
 
 -- CreateTable
@@ -201,10 +201,10 @@ ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_userId_fkey" FOREIGN KEY (
 ALTER TABLE "Pet" ADD CONSTRAINT "Pet_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UsersToPets" ADD CONSTRAINT "UsersToPets_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SavedPetRecord" ADD CONSTRAINT "SavedPetRecord_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UsersToPets" ADD CONSTRAINT "UsersToPets_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SavedPetRecord" ADD CONSTRAINT "SavedPetRecord_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PetProfile" ADD CONSTRAINT "PetProfile_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;

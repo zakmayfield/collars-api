@@ -20,7 +20,7 @@ import {
   applySkipConstraints,
   APP_SECRET,
 } from '../../utils/index.js';
-import { Pet } from '@prisma/client';
+import { Pet, Species, User } from '@prisma/client';
 
 export const resolvers = {
   // ::: query :::
@@ -31,7 +31,6 @@ export const resolvers = {
       args: { filterNeedle?: string; skip?: number; take?: number },
       context: ServerContext
     ) => {
-
       const where = args.filterNeedle
         ? {
             OR: [
@@ -59,7 +58,7 @@ export const resolvers = {
       const breeds = context.prisma.breed.findMany({
         where,
         skip,
-        take
+        take,
       });
 
       if (!breeds)
@@ -87,16 +86,7 @@ export const resolvers = {
           profile: true,
           savedPets: true,
           volunteers: true,
-          pets: {
-            include: {
-              breed: {
-                include: {
-                  breed: true,
-                  pet: true,
-                },
-              },
-            },
-          },
+          pets: true,
         },
       });
 
@@ -108,97 +98,87 @@ export const resolvers = {
       return userData;
     },
 
-    // // ::: Link :::
-    // linkFeed: async (
-    //   parent: unknown,
-    //   args: { filterNeedle?: string; skip?: number; take?: number },
-    //   context: ServerContext
-    // ) => {
+    // ::: Pet :::
 
-    //   /* Regarding filterNeedle
-    //     filterNeedle is a pretty powerful tool to utilize, this is allowing us to search our Link model based on a condition of similar characters. We can specify which rows we want to filter against, in this case below we are filtering against both properties, description and url. If we change this to just check description then any matchings against url wont register
-    //   */
+    petFeed: async (
+      // public
+      parent: unknown,
+      args: { filterNeedle?: Species | string; skip?: number; take?: number },
+      context: ServerContext
+    ) => {
+      const where = args.filterNeedle
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: args.filterNeedle.toLowerCase(),
+                },
+              },
+            ],
+          }
+        : {};
 
-    //   // note * consider making enums for available pagination min and max amounts ect
+      const take = applyTakeConstraints({
+        min: 1,
+        max: 50,
+        value: args.take ?? 30,
+      });
 
-    //   const where = args.filterNeedle
-    //     ? {
-    //         OR: [
-    //           { description: { contains: args.filterNeedle } },
-    //           { url: { contains: args.filterNeedle } },
-    //         ],
-    //       }
-    //     : {};
+      const skip = applySkipConstraints({
+        min: 0,
+        max: 50,
+        value: args.skip ?? 0,
+      });
 
-    //   const take = applyTakeConstraints({
-    //     min: 1,
-    //     max: 50,
-    //     value: args.take ?? 30,
-    //   });
+      const pets = context.prisma.pet.findMany({
+        where,
+        take,
+        skip,
+        include: {
+          breed: true,
+          savedBy: true,
+          agency: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
 
-    //   const skip = applySkipConstraints({
-    //     min: 0,
-    //     max: 50,
-    //     value: args.skip ?? 0,
-    //   });
+      return pets;
+    },
+  },
 
-    //   const linkFeed = await context.prisma.link.findMany({
-    //     where,
-    //     // take: number of items to take from the list
-    //     take,
-    //     // start at after x amount of indexes i.e. skip first 10
-    //     skip,
-    //   });
+  Pet: {
+    breed: async (parent: Pet, args: {}, context: ServerContext) => {
+      const breeds = await context.prisma.breedsToPets.findMany({
+        where: { petId: parent.id },
+        select: { breed: true },
+      });
 
-    //   if (linkFeed.length < 1) {
-    //     return Promise.reject(
-    //       new GraphQLError(`🚫 Nothing available, try adding some links.`)
-    //     );
-    //   }
+      return breeds;
+    },
 
-    //   return linkFeed;
-    // },
-    // link: async (
-    //   parent: unknown,
-    //   args: { id: number },
-    //   context: ServerContext
-    // ) => {
-    //   const { id } = args;
+    savedBy: async (parent: Pet, args: {}, context: ServerContext) => {
+      const savedBy = await context.prisma.savedPetRecord.findMany({
+        where: { petId: parent.id },
+        select: { user: true },
+      });
 
-    //   const link = await context.prisma.link.findUnique({
-    //     where: { id },
-    //   });
+      return savedBy;
+    },
+  },
 
-    //   return link;
-    // },
-    // linkComments: async (
-    //   parent: unknown,
-    //   args: { linkId: string },
-    //   context: ServerContext
-    // ) => {
-    //   const { linkId } = args;
+  User: {
+    savedPets: async (parent: User, args: {}, context: ServerContext) => {
+      const savedPets = await context.prisma.savedPetRecord.findMany({
+        where: { userId: parent.id },
+        select: { pet: true },
+      });
 
-    //   const linkComments = await context.prisma.link.findUnique({
-    //     where: { id: Number(linkId) },
-    //   });
-
-    //   return linkComments;
-    // },
-
-    // // ::: Comment :::
-    // comment: async (
-    //   parent: unknown,
-    //   args: { id: number },
-    //   context: ServerContext
-    // ) => {
-    //   const { id } = args;
-
-    //   const comment = await context.prisma.comment.findUnique({
-    //     where: { id },
-    //   });
-
-    //   return comment;
-    // },
+      return savedPets;
+    },
   },
 
   // /* Regarding Link & Comment below:
@@ -266,7 +246,7 @@ export const resolvers = {
           new GraphQLError(`🚫 Email is already taken, try another.`)
         );
       }
-      
+
       if (usernameExists) {
         return Promise.reject(
           new GraphQLError(`🚫 Username is already taken, try another.`)
@@ -458,6 +438,18 @@ export const resolvers = {
           new GraphQLError(`🚫 User is not authenticated. Please log in.`)
         );
 
+      // if pet.species !== breed.species throw error
+      const petToUpdate = await context.prisma.pet.findUnique({
+        where: { id: petId },
+      });
+      const breedToAdd = await context.prisma.breed.findUnique({
+        where: { id: breedId },
+      });
+      if (petToUpdate.species !== breedToAdd.species)
+        return Promise.reject(
+          new GraphQLError(`🚫 Pet species must match breed species.`)
+        );
+
       const newBreedOnPet = await context.prisma.breedsToPets.create({
         data: {
           petId,
@@ -488,6 +480,33 @@ export const resolvers = {
         return Promise.reject(new GraphQLError(`🚫 Couldn't locate that pet.`));
 
       return petWithNewBreed;
+    },
+    savePet: async (
+      parent: unknown,
+      args: { petId: string },
+      context: ServerContext
+    ) => {
+      const { user } = context;
+      const { petId } = args;
+      if (!user)
+        return Promise.reject(new GraphQLError(`🚫 Not authenticated`));
+
+      const savePet = await context.prisma.savedPetRecord.create({
+        data: {
+          petId,
+          userId: user.id,
+        },
+        select: {
+          pet: {
+            include: {},
+          },
+        },
+      });
+
+      if (!savePet)
+        return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
+
+      return savePet;
     },
   },
 };

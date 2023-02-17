@@ -10,7 +10,7 @@ var Species;
 async function createBreed(breed, species) {
     await prisma.breed.create({
         data: {
-            breed,
+            breed: breed.toLowerCase(),
             species,
         },
     });
