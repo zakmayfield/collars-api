@@ -12,7 +12,7 @@ enum Species {
 async function createBreed(breed: string, species: Species) {
   await prisma.breed.create({
     data: {
-      breed,
+      breed: breed.toLowerCase(),
       species,
     },
   });

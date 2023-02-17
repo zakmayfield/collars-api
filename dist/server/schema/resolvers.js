@@ -208,7 +208,7 @@ export const resolvers = {
                 where: { id: user.id },
             });
             if (!userData)
-                Promise.reject(new GraphQLError(`🚫 That user doesn't seem to exist`));
+                return Promise.reject(new GraphQLError(`🚫 That user doesn't seem to exist`));
             // validate the password
             const passwordIsValid = await bcrypt.compare(args.password, userData.password);
             if (!passwordIsValid)
@@ -227,20 +227,21 @@ export const resolvers = {
             const updatedUser = await context.prisma.user.update({
                 where: { id: user.id },
                 data: {
-                    ...args
-                }
+                    ...args,
+                },
             });
+            return updatedUser;
         },
         // ::: Pet :::
         postPet: async (parent, args, context) => {
             const { user } = context;
             if (!user)
-                Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
+                return Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
             if (user.type !== 'AGENCY')
-                Promise.reject(new GraphQLError(`🚫 This user does not have the proper authorization to do this.`));
+                return Promise.reject(new GraphQLError(`🚫 This user does not have the proper authorization to do this.`));
             const { name, species } = args;
             if (!name || !species)
-                Promise.reject(new GraphQLError(`🚫 Name and species are required fields when creating a pet.`));
+                return Promise.reject(new GraphQLError(`🚫 Name and species are required fields when creating a pet.`));
             const newPet = await context.prisma.pet.create({
                 data: {
                     name,
@@ -249,6 +250,21 @@ export const resolvers = {
                 },
             });
             return newPet;
+        },
+        deletePet: async (parent, args, context) => {
+            const { user } = context;
+            const { id } = args;
+            if (!user)
+                return Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
+            const petToDelete = await context.prisma.pet.findUnique({
+                where: { id }
+            });
+            if (petToDelete.agencyId !== user.id)
+                return Promise.reject(new GraphQLError(`🚫 User: ${user.id} does not have permission to delete pet with id: ${petToDelete.id}`));
+            const deletedPet = await context.prisma.pet.delete({
+                where: { id }
+            });
+            return deletedPet;
         },
         // // ::: Link :::
         // postLink: async (

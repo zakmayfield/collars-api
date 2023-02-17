@@ -1,6 +1,7 @@
 export const typeDefs = /* GraphQL */ `
   type Query {
     getUser: User!
+    getBreeds(filterNeedle: String, skip: Int, take: Int): [Breed!]!
     # linkFeed(filterNeedle: String, take: Int, skip: Int): [Link]!
     # link(id: Int!): Link
     # comment(id: Int!): Comment
@@ -11,19 +12,20 @@ export const typeDefs = /* GraphQL */ `
     signUp(
       name: String!
       email: String!
+      username: String
       password: String!
       type: String!
     ): AuthPayload
     login(email: String!, password: String!): AuthPayload
     deleteUserAccount(password: String!): User
-    updateUserAccount(
-      type: String
-    ): User
+    updateUserAccount(type: String): User
     postPet(name: String!, species: Species!): Pet
+    deletePet(id: String!): Pet
+    addBreedToPet(petId: String!, breedId: String!): Pet
   }
 
   type Address {
-    id: ID!
+    id: String!
     address: String!
     apartment: String
     city: String!
@@ -35,7 +37,7 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Contact {
-    id: ID!
+    id: String!
     phone: String
     email: String
     userProfile: UserProfile
@@ -47,16 +49,18 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type AuthUser {
-    id: ID!
+    id: String!
     name: String!
     email: String!
+    username: String
     type: String!
   }
 
   type User {
-    id: ID!
+    id: String!
     name: String!
     email: String!
+    username: String
     type: String!
     profile: UserProfile
     pets: [Pet]
@@ -65,7 +69,7 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type UserProfile {
-    id: ID!
+    id: String!
     bio: String
     address: [Address]
     contact: [Contact]
@@ -79,7 +83,7 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Volunteer {
-    id: ID!
+    id: String!
     name: String!
     email: String!
     address: Address
@@ -93,7 +97,7 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Pet {
-    id: ID!
+    id: String!
     name: String!
     species: Species!
     breed: [BreedsToPets]
@@ -118,14 +122,14 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Breed {
-    id: ID!
+    id: String!
     breed: String!
     species: Species!
     pets: [BreedsToPets]
   }
 
   type PetProfile {
-    id: ID!
+    id: String!
     age: Int
     bio: String
     weight: Int
@@ -153,7 +157,7 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Image {
-    id: ID!
+    id: String!
     url: String
     file: String
     thumbnail: String

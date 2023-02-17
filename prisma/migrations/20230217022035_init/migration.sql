@@ -24,34 +24,35 @@ CREATE TYPE "GoodWith" AS ENUM ('UNKNOWN', 'CATS', 'DOGS', 'CHILDREN', 'CATS_AND
 
 -- CreateTable
 CREATE TABLE "Address" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "address" VARCHAR(100) NOT NULL,
     "apartment" VARCHAR(25),
     "city" VARCHAR(50) NOT NULL,
     "state" VARCHAR(50) NOT NULL,
     "zip" INTEGER NOT NULL,
     "country" VARCHAR(100) NOT NULL,
-    "volunteerId" INTEGER,
-    "userProfileId" INTEGER,
+    "volunteerId" TEXT,
+    "userProfileId" TEXT,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Contact" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "phone" VARCHAR(50),
     "email" VARCHAR(75),
-    "userProfileId" INTEGER,
+    "userProfileId" TEXT,
 
     CONSTRAINT "Contact_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "username" TEXT,
     "password" TEXT NOT NULL,
     "type" "AccountType" NOT NULL DEFAULT 'DEFAULT',
 
@@ -60,31 +61,31 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Volunteer" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "phone" TEXT,
-    "agencyId" INTEGER NOT NULL,
+    "agencyId" TEXT NOT NULL,
 
     CONSTRAINT "Volunteer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "UserProfile" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "bio" VARCHAR(500),
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT,
 
     CONSTRAINT "UserProfile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Pet" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "species" "Species" NOT NULL,
-    "agencyId" INTEGER,
+    "agencyId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -93,15 +94,15 @@ CREATE TABLE "Pet" (
 
 -- CreateTable
 CREATE TABLE "UsersToPets" (
-    "userId" INTEGER NOT NULL,
-    "petId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+    "petId" TEXT NOT NULL,
 
     CONSTRAINT "UsersToPets_pkey" PRIMARY KEY ("userId","petId")
 );
 
 -- CreateTable
 CREATE TABLE "PetProfile" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "age" INTEGER,
     "bio" VARCHAR(250),
     "weight" INTEGER,
@@ -117,14 +118,14 @@ CREATE TABLE "PetProfile" (
     "color" "Color" DEFAULT 'UNKNOWN',
     "goodWith" "GoodWith" DEFAULT 'UNKNOWN',
     "personality" "Personality" DEFAULT 'UNKNOWN',
-    "petId" INTEGER NOT NULL,
+    "petId" TEXT,
 
     CONSTRAINT "PetProfile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Breed" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "breed" TEXT NOT NULL,
     "species" "Species" NOT NULL,
 
@@ -133,15 +134,15 @@ CREATE TABLE "Breed" (
 
 -- CreateTable
 CREATE TABLE "BreedsToPets" (
-    "breedId" INTEGER NOT NULL,
-    "petId" INTEGER NOT NULL,
+    "breedId" TEXT NOT NULL,
+    "petId" TEXT NOT NULL,
 
     CONSTRAINT "BreedsToPets_pkey" PRIMARY KEY ("breedId","petId")
 );
 
 -- CreateTable
 CREATE TABLE "Image" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "url" TEXT,
     "file" TEXT,
     "thumbnail" TEXT,
@@ -151,8 +152,8 @@ CREATE TABLE "Image" (
 
 -- CreateTable
 CREATE TABLE "ImagesToPetProfiles" (
-    "imageId" INTEGER NOT NULL,
-    "petProfileId" INTEGER NOT NULL,
+    "imageId" TEXT NOT NULL,
+    "petProfileId" TEXT NOT NULL,
 
     CONSTRAINT "ImagesToPetProfiles_pkey" PRIMARY KEY ("imageId","petProfileId")
 );
@@ -168,6 +169,9 @@ CREATE UNIQUE INDEX "Contact_userProfileId_key" ON "Contact"("userProfileId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Volunteer_email_key" ON "Volunteer"("email");

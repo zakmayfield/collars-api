@@ -6,7 +6,7 @@ export type ServerContext = {
 };
 
 export type SecureUser = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   type: string;
@@ -20,6 +20,7 @@ export type ContextProps = {
 export interface SignupArgs {
   name: string;
   email: string;
+  username?: string;
   password: string;
   type: AccountType;
 }
@@ -56,13 +57,3 @@ export enum Species {
   REPTILE = 'REPTILE',
   BARNYARD = 'BARNYARD',
 }
-
-// export interface PostLinkArgs {
-//   description: string;
-//   url: string;
-// }
-
-// export interface PostCommentArgs {
-//   body: string;
-//   linkId: number;
-// }

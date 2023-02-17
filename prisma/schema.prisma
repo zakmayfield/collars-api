@@ -39,7 +39,7 @@ datasource db {
 // }
 
 model Address {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   address   String  @db.VarChar(100)
   apartment String? @db.VarChar(25)
@@ -51,25 +51,26 @@ model Address {
   userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  volunteerId   Int? @unique
-  userProfileId Int? @unique
+  volunteerId   String? @unique
+  userProfileId String? @unique
 }
 
 model Contact {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   phone String? @db.VarChar(50)
   email String? @db.VarChar(75)
 
   userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
-  userProfileId Int? @unique
+  userProfileId String? @unique
 }
 
 model User {
-  id       Int         @id @default(autoincrement())
+  id       String         @id @default(uuid())
   name     String
-  email    String      @unique
+  email    String       @unique
+  username String?      @unique
   password String
   type     AccountType @default(DEFAULT)
 
@@ -82,7 +83,7 @@ model User {
 }
 
 model Volunteer {
-  id       Int     @id @default(autoincrement())
+  id       String     @id @default(uuid())
   name     String
   email    String  @unique
   // allow password to be changed via permissions on the front by either the volunteer themself of the agency who created this volunteer
@@ -92,7 +93,7 @@ model Volunteer {
   address Address?
 
   agency   User @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  agencyId Int
+  agencyId String
 }
 
 enum AccountType {
@@ -102,18 +103,18 @@ enum AccountType {
 }
 
 model UserProfile {
-  id  Int     @id @default(autoincrement())
+  id  String     @id @default(uuid())
   bio String? @db.VarChar(500)
 
   address Address[]
   contact Contact[]
 
   user   User? @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId Int?  @unique
+  userId String?  @unique
 }
 
 model Pet {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   name    String         @db.VarChar(50)
   species Species
@@ -123,7 +124,7 @@ model Pet {
   profile PetProfile?
 
   agency   User? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  agencyId Int?
+  agencyId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,9 +132,9 @@ model Pet {
 
 model UsersToPets {
   user   User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId Int
+  userId String
   pet    Pet  @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId  Int
+  petId  String
 
   @@id([userId, petId])
 }
@@ -149,7 +150,7 @@ enum Species {
 }
 
 model PetProfile {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   age      Int?
   bio      String? @db.VarChar(250)
@@ -173,7 +174,7 @@ model PetProfile {
   images ImagesToPetProfiles[]
 
   pet   Pet? @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId Int? @unique
+  petId String? @unique
 }
 
 enum Sex {
@@ -226,7 +227,7 @@ enum GoodWith {
 }
 
 model Breed {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   breed   String
   species Species
@@ -236,15 +237,15 @@ model Breed {
 
 model BreedsToPets {
   breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  breedId Int
+  breedId String
   pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petId   Int
+  petId   String
 
   @@id([breedId, petId])
 }
 
 model Image {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   url       String?
   file      String?
@@ -255,9 +256,9 @@ model Image {
 
 model ImagesToPetProfiles {
   image        Image      @relation(fields: [imageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  imageId      Int
+  imageId      String
   petProfile   PetProfile @relation(fields: [petProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  petProfileId Int
+  petProfileId String
 
   @@id([imageId, petProfileId])
 }

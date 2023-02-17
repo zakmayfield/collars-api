@@ -25,6 +25,51 @@ import { Pet } from '@prisma/client';
 export const resolvers = {
   // ::: query :::
   Query: {
+    // ::: Breed :::
+    getBreeds: async (
+      parent: unknown,
+      args: { filterNeedle?: string; skip?: number; take?: number },
+      context: ServerContext
+    ) => {
+
+      const where = args.filterNeedle
+        ? {
+            OR: [
+              {
+                breed: {
+                  contains: args.filterNeedle.toLowerCase(),
+                },
+              },
+            ],
+          }
+        : {};
+
+      const take = applyTakeConstraints({
+        min: 1,
+        max: 50,
+        value: args.take ?? 30,
+      });
+
+      const skip = applySkipConstraints({
+        min: 0,
+        max: 50,
+        value: args.skip ?? 0,
+      });
+
+      const breeds = context.prisma.breed.findMany({
+        where,
+        skip,
+        take
+      });
+
+      if (!breeds)
+        return Promise.reject(
+          new GraphQLError(`🚫 Server error, couldn't locate breeds.`)
+        );
+
+      return breeds;
+    },
+
     // ::: User :::
     getUser: async (parent: unknown, args: {}, context: ServerContext) => {
       const { user } = context;
@@ -69,12 +114,6 @@ export const resolvers = {
     //   args: { filterNeedle?: string; skip?: number; take?: number },
     //   context: ServerContext
     // ) => {
-
-    //   // // i can now authenticate an operation by adding this guard, i can probably extrapolate this to its own middleware
-    //   // if (!context.user)
-    //   //   return Promise.reject(
-    //   //     new GraphQLError(`🚫 Please login to view this data.`)
-    //   //   );
 
     //   /* Regarding filterNeedle
     //     filterNeedle is a pretty powerful tool to utilize, this is allowing us to search our Link model based on a condition of similar characters. We can specify which rows we want to filter against, in this case below we are filtering against both properties, description and url. If we change this to just check description then any matchings against url wont register
@@ -165,8 +204,6 @@ export const resolvers = {
   // /* Regarding Link & Comment below:
   //   Link and Comment is pretty sweet - when hitting a query for our Link model we are allowing the client to also query the available comments on the Link, but in a separate query. This means the top level query of Link can succeed but the sub query of comments on the same query can fail, meaning we still have access to the top level of our data { ...link ✅  | comments 🚫 }. This means our UI can support data on multiple levels allowing us to avoid error bubbling and crashing our whole application. For instance a page with several sub tabs, the lowest sub tab can fail on the query but the rest of the data will load fine because the query didn't fail as a whole, only on comments
   // */
-
-  // // ::: link :::
   // Link: {
   //   comments: async (parent: Link, args: {}, context: ServerContext) => {
   //     return await context.prisma.comment.findMany({
@@ -207,20 +244,32 @@ export const resolvers = {
     ) => {
       // validate args // throw if incomplete data
 
-      const { name, email, password } = args;
+      const { name, email, username, password } = args;
       if (!name || !email || !password) {
         return Promise.reject(new GraphQLError(`🚫 All fields are required.`));
       }
 
-      console.log('args', args);
-
-      // check if email exists
       const emailExists = await context.prisma.user.findUnique({
         where: { email },
       });
+
+      let usernameExists;
+
+      if (username) {
+        usernameExists = await context.prisma.user.findUnique({
+          where: { username },
+        });
+      }
+
       if (emailExists) {
         return Promise.reject(
-          new GraphQLError(`🚫 Email is already taken, try again.`)
+          new GraphQLError(`🚫 Email is already taken, try another.`)
+        );
+      }
+      
+      if (usernameExists) {
+        return Promise.reject(
+          new GraphQLError(`🚫 Username is already taken, try another.`)
         );
       }
 
@@ -288,7 +337,9 @@ export const resolvers = {
       });
 
       if (!userData)
-        Promise.reject(new GraphQLError(`🚫 That user doesn't seem to exist`));
+        return Promise.reject(
+          new GraphQLError(`🚫 That user doesn't seem to exist`)
+        );
 
       // validate the password
       const passwordIsValid = await bcrypt.compare(
@@ -316,16 +367,16 @@ export const resolvers = {
           new GraphQLError(`🚫 Please login to perform this action.`)
         );
 
-      const { type } = args
+      const { type } = args;
 
       const updatedUser = await context.prisma.user.update({
         where: { id: user.id },
-        data: { 
-          ...args
-        }
-      })
+        data: {
+          ...args,
+        },
+      });
 
-      return updatedUser
+      return updatedUser;
     },
 
     // ::: Pet :::
@@ -336,12 +387,12 @@ export const resolvers = {
     ) => {
       const { user } = context;
       if (!user)
-        Promise.reject(
+        return Promise.reject(
           new GraphQLError(`🚫 User is not authenticated. Please log in.`)
         );
 
       if (user.type !== 'AGENCY')
-        Promise.reject(
+        return Promise.reject(
           new GraphQLError(
             `🚫 This user does not have the proper authorization to do this.`
           )
@@ -350,7 +401,7 @@ export const resolvers = {
       const { name, species } = args;
 
       if (!name || !species)
-        Promise.reject(
+        return Promise.reject(
           new GraphQLError(
             `🚫 Name and species are required fields when creating a pet.`
           )
@@ -366,270 +417,77 @@ export const resolvers = {
 
       return newPet;
     },
+    deletePet: async (
+      parent: unknown,
+      args: { id: string },
+      context: ServerContext
+    ) => {
+      const { user } = context;
+      const { id } = args;
+      if (!user)
+        return Promise.reject(
+          new GraphQLError(`🚫 User is not authenticated. Please log in.`)
+        );
 
-    // // ::: Link :::
-    // postLink: async (
-    //   parent: unknown,
-    //   args: PostLinkArgs,
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
-    //   if (!user)
-    //     return Promise.reject(
-    //       new GraphQLError(`🚫 User is not authenticated. Please log in.`)
-    //     );
+      const petToDelete = await context.prisma.pet.findUnique({
+        where: { id },
+      });
 
-    //   const { description, url } = args;
-    //   if (!description || !url)
-    //     return Promise.reject(new GraphQLError(`🚫 All fields are required.`));
+      if (petToDelete.agencyId !== user.id)
+        return Promise.reject(
+          new GraphQLError(
+            `🚫 User: ${user.id} does not have permission to delete pet with id: ${petToDelete.id}`
+          )
+        );
 
-    //   const newLink: Link = await context.prisma.link.create({
-    //     data: {
-    //       description,
-    //       url,
-    //       postedById: user.id,
-    //     },
-    //   });
+      const deletedPet = await context.prisma.pet.delete({
+        where: { id },
+      });
 
-    //   return newLink;
-    // },
-    // deleteLink: async (
-    //   parent: unknown,
-    //   args: { id: number },
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
+      return deletedPet;
+    },
+    addBreedToPet: async (
+      parent: unknown,
+      args: { petId: string; breedId: string },
+      context: ServerContext
+    ) => {
+      const { user } = context;
+      const { petId, breedId } = args;
+      if (!user)
+        return Promise.reject(
+          new GraphQLError(`🚫 User is not authenticated. Please log in.`)
+        );
 
-    //   const { id } = args;
+      const newBreedOnPet = await context.prisma.breedsToPets.create({
+        data: {
+          petId,
+          breedId,
+        },
+      });
 
-    //   const linkToDelete = await context.prisma.link.findUnique({
-    //     where: { id },
-    //   });
+      if (!newBreedOnPet)
+        return Promise.reject(
+          new GraphQLError(`🚫 Something went wrong ::: addBreedToPet`)
+        );
 
-    //   if (!linkToDelete) {
-    //     return Promise.reject(
-    //       new GraphQLError(`Link with ID: '${id}' does not exist.`)
-    //     );
-    //   }
+      const petWithNewBreed = await context.prisma.pet.findUnique({
+        where: { id: petId },
+        select: {
+          id: true,
+          name: true,
+          species: true,
+          breed: {
+            include: {
+              breed: true,
+            },
+          },
+        },
+      });
 
-    //   if (linkToDelete.postedById !== user.id) {
-    //     return Promise.reject(
-    //       new GraphQLError(
-    //         `User with ID: '${user.id}' did not create link with ID ${linkToDelete.id}`
-    //       )
-    //     );
-    //   }
+      if (!petWithNewBreed)
+        return Promise.reject(new GraphQLError(`🚫 Couldn't locate that pet.`));
 
-    //   const deletedLink = await context.prisma.link
-    //     .delete({
-    //       where: { id },
-    //     })
-    //     .catch((err: unknown) => {
-    //       if (
-    //         err instanceof PrismaClientKnownRequestError &&
-    //         err.code === 'P2003'
-    //       ) {
-    //         return Promise.reject(
-    //           new GraphQLError(
-    //             `Cannot delete non-existing link with id '${id}'.`
-    //           )
-    //         );
-    //       }
-    //       return Promise.reject(err);
-    //     });
-
-    //   return deletedLink;
-    // },
-    // updateLink: async (
-    //   parent: unknown,
-    //   args: UpdateLinkArgs,
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
-
-    //   const { id, description, url } = args;
-
-    //   const linkToUpdate = await context.prisma.link.findUnique({
-    //     where: { id },
-    //   });
-
-    //   if (!linkToUpdate) {
-    //     return Promise.reject(
-    //       new GraphQLError(`Link with ID: '${id}' does not exist.`)
-    //     );
-    //   }
-
-    //   if (linkToUpdate.postedById !== user.id) {
-    //     return Promise.reject(
-    //       new GraphQLError(
-    //         `User with ID: '${user.id}' did not create link with ID ${linkToUpdate.id}`
-    //       )
-    //     );
-    //   }
-
-    //   const updatedLink = await context.prisma.link
-    //     .update({
-    //       where: { id },
-    //       data: {
-    //         description,
-    //         url,
-    //       },
-    //     })
-    //     .catch((err: unknown) => {
-    //       if (
-    //         err instanceof PrismaClientKnownRequestError &&
-    //         err.code === 'P2003'
-    //       ) {
-    //         return Promise.reject(
-    //           new GraphQLError(
-    //             `Cannot delete non-existing link with id '${id}'.`
-    //           )
-    //         );
-    //       }
-    //       return Promise.reject(err);
-    //     });
-
-    //   return updatedLink;
-    // },
-
-    // // ::: Comment :::
-    // postCommentOnLink: async (
-    //   parent: unknown,
-    //   args: PostCommentArgs,
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
-    //   const { body, linkId } = args;
-
-    //   const linkToPostCommentOn = await context.prisma.link.findUnique({
-    //     where: { id: linkId },
-    //   });
-
-    //   if (!linkToPostCommentOn)
-    //     return Promise.reject(
-    //       new GraphQLError(`Link with ID: '${linkId}' does not exist.`)
-    //     );
-
-    //   if (!body)
-    //     return Promise.reject(new GraphQLError(`🚫 Body is a required field`));
-
-    //   const newComment: Comment = await context.prisma.comment
-    //     .create({
-    //       data: {
-    //         body,
-    //         linkId,
-    //         postedById: user.id,
-    //       },
-    //     })
-    //     .catch((err: unknown) => {
-    //       if (
-    //         err instanceof PrismaClientKnownRequestError &&
-    //         err.code === 'P2003'
-    //       ) {
-    //         return Promise.reject(
-    //           new GraphQLError(
-    //             `Cannot post comment on non-existing link with id '${linkId}'.`
-    //           )
-    //         );
-    //       }
-    //       return Promise.reject(err);
-    //     });
-
-    //   return newComment;
-    // },
-    // deleteCommentOnLink: async (
-    //   parent: unknown,
-    //   args: { commentId: number },
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
-    //   const { commentId } = args;
-
-    //   const commentToDelete = await context.prisma.comment.findUnique({
-    //     where: { id: commentId },
-    //   });
-
-    //   if (!commentToDelete) {
-    //     return Promise.reject(
-    //       new GraphQLError(`Comment with ID: '${commentId}' does not exist.`)
-    //     );
-    //   }
-
-    //   if (commentToDelete.postedById !== user.id) {
-    //     return Promise.reject(
-    //       new GraphQLError(
-    //         `User with ID: '${user.id}' did not author comment with ID ${commentToDelete.id}`
-    //       )
-    //     );
-    //   }
-
-    //   const deletedComment: Comment = await context.prisma.comment
-    //     .delete({
-    //       where: { id: commentId },
-    //     })
-    //     .catch((err: unknown) => {
-    //       if (
-    //         err instanceof PrismaClientKnownRequestError &&
-    //         err.code === 'P2003'
-    //       ) {
-    //         return Promise.reject(
-    //           new GraphQLError(
-    //             `Cannot delete a non-existing comment with id '${commentId}'.`
-    //           )
-    //         );
-    //       }
-    //       return Promise.reject(err);
-    //     });
-
-    //   return deletedComment;
-    // },
-    // updateCommentOnLink: async (
-    //   parent: unknown,
-    //   args: UpdateCommentArgs,
-    //   context: ServerContext
-    // ) => {
-    //   const { user } = context;
-    //   const { commentId, body } = args;
-
-    //   const commentToUpdate = await context.prisma.comment.findUnique({
-    //     where: { id: commentId },
-    //   });
-
-    //   if (!commentToUpdate) {
-    //     return Promise.reject(
-    //       new GraphQLError(`Comment with ID: '${commentId}' does not exist.`)
-    //     );
-    //   }
-    //   if (commentToUpdate.postedById !== user.id) {
-    //     return Promise.reject(
-    //       new GraphQLError(
-    //         `User with ID: '${user.id}' did not author comment with ID ${commentToUpdate.id}`
-    //       )
-    //     );
-    //   }
-
-    //   const updatedComment: Comment = await context.prisma.comment
-    //     .update({
-    //       where: { id: commentId },
-    //       data: {
-    //         body,
-    //       },
-    //     })
-    //     .catch((err: unknown) => {
-    //       if (
-    //         err instanceof PrismaClientKnownRequestError &&
-    //         err.code === 'P2003'
-    //       ) {
-    //         return Promise.reject(
-    //           new GraphQLError(
-    //             `Cannot post comment on non-existing link with id '${commentId}'.`
-    //           )
-    //         );
-    //       }
-    //       return Promise.reject(err);
-    //     });
-
-    //   return updatedComment;
-    // },
+      return petWithNewBreed;
+    },
   },
 };

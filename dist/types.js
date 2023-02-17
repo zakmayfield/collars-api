@@ -14,11 +14,3 @@ export var Species;
     Species["REPTILE"] = "REPTILE";
     Species["BARNYARD"] = "BARNYARD";
 })(Species || (Species = {}));
-// export interface PostLinkArgs {
-//   description: string;
-//   url: string;
-// }
-// export interface PostCommentArgs {
-//   body: string;
-//   linkId: number;
-// }
