@@ -3,10 +3,6 @@ export const typeDefs = /* GraphQL */ `
     getUser: User!
     getBreeds(filterNeedle: String, skip: Int, take: Int): [Breed!]!
     petFeed(filterNeedle: String, skip: Int, take: Int): [Pet]!
-    # linkFeed(filterNeedle: String, take: Int, skip: Int): [Link]!
-    # link(id: Int!): Link
-    # comment(id: Int!): Comment
-    # linkComments(linkId: Int!): Link
   }
 
   type Mutation {
@@ -95,6 +91,8 @@ export const typeDefs = /* GraphQL */ `
 
   type UsersToPets {
     user: User
+    # i was missing the pet prop here and it was throwing a very small isolated error that i couldn't locate -- gotcha
+    pet: Pet
   }
 
   type Pet {

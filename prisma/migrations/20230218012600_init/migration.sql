@@ -31,8 +31,8 @@ CREATE TABLE "Address" (
     "state" VARCHAR(50) NOT NULL,
     "zip" INTEGER NOT NULL,
     "country" VARCHAR(100) NOT NULL,
-    "volunteerId" TEXT,
     "userProfileId" TEXT,
+    "volunteerId" TEXT,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
@@ -43,6 +43,7 @@ CREATE TABLE "Contact" (
     "phone" VARCHAR(50),
     "email" VARCHAR(75),
     "userProfileId" TEXT,
+    "volunteerId" TEXT,
 
     CONSTRAINT "Contact_pkey" PRIMARY KEY ("id")
 );
@@ -159,13 +160,16 @@ CREATE TABLE "ImagesToPetProfiles" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Address_volunteerId_key" ON "Address"("volunteerId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Address_userProfileId_key" ON "Address"("userProfileId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Address_volunteerId_key" ON "Address"("volunteerId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Contact_userProfileId_key" ON "Contact"("userProfileId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Contact_volunteerId_key" ON "Contact"("volunteerId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -190,6 +194,9 @@ ALTER TABLE "Address" ADD CONSTRAINT "Address_volunteerId_fkey" FOREIGN KEY ("vo
 
 -- AddForeignKey
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_userProfileId_fkey" FOREIGN KEY ("userProfileId") REFERENCES "UserProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Contact" ADD CONSTRAINT "Contact_volunteerId_fkey" FOREIGN KEY ("volunteerId") REFERENCES "Volunteer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Volunteer" ADD CONSTRAINT "Volunteer_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
