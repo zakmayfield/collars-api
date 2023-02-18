@@ -91,6 +91,8 @@ export const typeDefs = /* GraphQL */ `
 
   type UsersToPets {
     user: User
+    # i was missing the pet prop here and it was throwing a very small isolated error that i couldn't locate -- gotcha
+    pet: Pet
   }
 
   type Pet {

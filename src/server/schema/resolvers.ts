@@ -43,22 +43,8 @@ export const resolvers = {
           }
         : {};
 
-      const take = applyTakeConstraints({
-        min: 1,
-        max: 50,
-        value: args.take ?? 30,
-      });
-
-      const skip = applySkipConstraints({
-        min: 0,
-        max: 50,
-        value: args.skip ?? 0,
-      });
-
       const breeds = context.prisma.breed.findMany({
         where,
-        skip,
-        take,
       });
 
       if (!breeds)
@@ -134,7 +120,7 @@ export const resolvers = {
         include: {
           breed: true,
           savedBy: true,
-          agency: true
+          agency: true,
         },
       });
 
@@ -159,37 +145,51 @@ export const resolvers = {
 
     agency: async (parent: Pet, args: {}, context: ServerContext) => {
       return await context.prisma.user.findUnique({
-        where: { id: parent.agencyId }
-      })
-    }
+        where: { id: parent.agencyId },
+      });
+    },
   },
 
   User: {
     savedPets: async (parent: User, args: {}, context: ServerContext) => {
-      return await context.prisma.savedPetRecord.findMany({
-        where: { userId: parent.id }
+      const savedPets = await context.prisma.savedPetRecord.findMany({
+        where: { userId: parent.id },
+        select: { petId: true },
       });
+
+      const petIds = savedPets.map((savedPet) => savedPet.petId);
+
+      const saved = await context.prisma.savedPetRecord.findMany({
+        where: { 
+          petId: { in: petIds }, 
+          userId: parent.id 
+        }, select: {
+          pet: true
+        },
+      });
+
+      return saved
     },
 
-    profile: async  (parent: User, args: {}, context: ServerContext) => {
+    profile: async (parent: User, args: {}, context: ServerContext) => {
       return await context.prisma.userProfile.findUnique({
-        where: { userId: parent.id}
-      })
-    }
+        where: { userId: parent.id },
+      });
+    },
   },
 
   UserProfile: {
-    address:  async  (parent: UserProfile, args: {}, context: ServerContext) => {
+    address: async (parent: UserProfile, args: {}, context: ServerContext) => {
       return await context.prisma.address.findMany({
-        where: { userProfileId: parent.id }
-      })
+        where: { userProfileId: parent.id },
+      });
     },
 
-    contact:  async  (parent: UserProfile, args: {}, context: ServerContext) => {
+    contact: async (parent: UserProfile, args: {}, context: ServerContext) => {
       return await context.prisma.contact.findMany({
-        where: { userProfileId: parent.id }
-      })
-    }
+        where: { userProfileId: parent.id },
+      });
+    },
   },
 
   // ::: mutations :::
@@ -243,9 +243,9 @@ export const resolvers = {
 
       await context.prisma.userProfile.create({
         data: {
-          userId: user.id
-        }
-      })
+          userId: user.id,
+        },
+      });
 
       const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
@@ -343,8 +343,6 @@ export const resolvers = {
       return updatedUser;
     },
 
-   
-
     // ::: Pet :::
     postPet: async (
       parent: unknown,
@@ -378,6 +376,12 @@ export const resolvers = {
           name,
           species,
           agencyId: user.id,
+        },
+      });
+
+      await context.prisma.petProfile.create({
+        data: {
+          petId: newPet.id,
         },
       });
 
@@ -454,7 +458,7 @@ export const resolvers = {
           id: true,
           name: true,
           species: true,
-          breed: true
+          breed: true,
         },
       });
 
@@ -479,15 +483,15 @@ export const resolvers = {
         data: {
           petId: petId,
           userId: user.id,
-        }
+        },
       });
 
       if (!savePet)
         return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
 
       return await context.prisma.pet.findUnique({
-        where: { id: petId }
-      })
+        where: { id: petId },
+      });
     },
   },
 };
