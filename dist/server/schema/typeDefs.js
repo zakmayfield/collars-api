@@ -23,6 +23,7 @@ export const typeDefs = /* GraphQL */ `
     postPet(name: String!, species: Species!): Pet
     deletePet(id: String!): Pet
     addBreedToPet(petId: String!, breedId: String!): Pet
+    saveOrRemoveSavedPet(petId: String!): Pet
   }
 
   type Address {
@@ -94,7 +95,6 @@ export const typeDefs = /* GraphQL */ `
 
   type UsersToPets {
     user: User
-    pet: Pet
   }
 
   type Pet {

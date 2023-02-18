@@ -35,9 +35,9 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
     },
   });
 
-  console.log('::: authenticate ::: USER :::', {
-    ...user
-  })
+  // console.log('::: authenticate ::: USER :::', {
+  //   ...user
+  // })
 
   return {
     ...user

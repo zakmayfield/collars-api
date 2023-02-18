@@ -52,16 +52,7 @@ export const resolvers = {
                     profile: true,
                     savedPets: true,
                     volunteers: true,
-                    pets: {
-                        include: {
-                            breed: {
-                                include: {
-                                    breed: true,
-                                    pet: true,
-                                },
-                            },
-                        },
-                    },
+                    pets: true,
                 },
             });
             if (!userData)
@@ -69,7 +60,8 @@ export const resolvers = {
             return userData;
         },
         // ::: Pet :::
-        petFeed: async (// public
+        petFeed: async (
+        // public
         parent, args, context) => {
             const where = args.filterNeedle
                 ? {
@@ -97,32 +89,43 @@ export const resolvers = {
                 take,
                 skip,
                 include: {
-                    breed: {
-                        include: {
-                            breed: true
-                        }
-                    },
+                    breed: true,
                     savedBy: true,
                     agency: {
                         select: {
                             id: true,
                             name: true,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
             return pets;
         },
     },
     Pet: {
         breed: async (parent, args, context) => {
-            return context;
+            const breeds = await context.prisma.breedsToPets.findMany({
+                where: { petId: parent.id },
+                select: { breed: true },
+            });
+            return breeds;
         },
-        // savedBy: async (parent: Pet, args: {}, context: ServerContext) => {
-        //   return await context.prisma.user.findUnique({
-        //     where: { id }
-        //   })
-        // }
+        savedBy: async (parent, args, context) => {
+            const savedBy = await context.prisma.savedPetRecord.findMany({
+                where: { petId: parent.id },
+                select: { user: true },
+            });
+            return savedBy;
+        },
+    },
+    User: {
+        savedPets: async (parent, args, context) => {
+            const savedPets = await context.prisma.savedPetRecord.findMany({
+                where: { userId: parent.id },
+                select: { pet: true },
+            });
+            return savedPets;
+        },
     },
     // /* Regarding Link & Comment below:
     //   Link and Comment is pretty sweet - when hitting a query for our Link model we are allowing the client to also query the available comments on the Link, but in a separate query. This means the top level query of Link can succeed but the sub query of comments on the same query can fail, meaning we still have access to the top level of our data { ...link ✅  | comments 🚫 }. This means our UI can support data on multiple levels allowing us to avoid error bubbling and crashing our whole application. For instance a page with several sub tabs, the lowest sub tab can fail on the query but the rest of the data will load fine because the query didn't fail as a whole, only on comments
@@ -283,6 +286,15 @@ export const resolvers = {
             const { petId, breedId } = args;
             if (!user)
                 return Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
+            // if pet.species !== breed.species throw error
+            const petToUpdate = await context.prisma.pet.findUnique({
+                where: { id: petId },
+            });
+            const breedToAdd = await context.prisma.breed.findUnique({
+                where: { id: breedId },
+            });
+            if (petToUpdate.species !== breedToAdd.species)
+                return Promise.reject(new GraphQLError(`🚫 Pet species must match breed species.`));
             const newBreedOnPet = await context.prisma.breedsToPets.create({
                 data: {
                     petId,
@@ -307,6 +319,45 @@ export const resolvers = {
             if (!petWithNewBreed)
                 return Promise.reject(new GraphQLError(`🚫 Couldn't locate that pet.`));
             return petWithNewBreed;
+        },
+        saveOrRemoveSavedPet: async (parent, args, context) => {
+            const { user } = context;
+            const { petId } = args;
+            if (!user)
+                return Promise.reject(new GraphQLError(`🚫 Not authenticated`));
+            // save or remove if exists
+            // 1.) does user already have this pet saved?
+            // aka does a SavePetRecord exist with userId && petId
+            const savedPetRecordExists = await context.prisma.savedPetRecord.findMany({
+                where: {
+                    petId,
+                    userId: user.id,
+                },
+            });
+            if (savedPetRecordExists) {
+                const deletedSavedPetRecord = await context.prisma.savedPetRecord.delete({
+                    where: {
+                        userId_petId: {
+                            petId,
+                            userId: user.id,
+                        },
+                    },
+                });
+                return deletedSavedPetRecord;
+            }
+            // save pet path
+            const savePet = await context.prisma.savedPetRecord.create({
+                data: {
+                    petId,
+                    userId: user.id,
+                },
+                select: {
+                    pet: true,
+                },
+            });
+            if (!savePet)
+                return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
+            return savePet;
         },
     },
 };

@@ -10,34 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Link {
-//   id          Int       @id @default(autoincrement())
-//   createdAt   DateTime  @default(now())
-//   description String
-//   url         String
-//   comments    Comment[]
-//   postedBy    User?     @relation(fields: [postedById], references: [id])
-//   postedById  Int?
-// }
-
-// model Comment {
-//   id     Int    @id @default(autoincrement())
-//   body   String
-//   link   Link?  @relation(fields: [linkId], references: [id], onDelete: Cascade)
-//   linkId Int?
-//   postedBy User? @relation(fields: [postedById], references: [id])
-//   postedById  Int?
-// }
-
-// model User {
-//   id       Int    @id @default(autoincrement())
-//   name     String
-//   email    String @unique
-//   password String
-//   links    Link[]
-//   comments Comment[]
-// }
-
 model Address {
   id String @id @default(uuid())
 
@@ -104,7 +76,7 @@ enum AccountType {
 
 model UserProfile {
   id  String     @id @default(uuid())
-  bio String? @db.VarChar(500)
+  bio String?    @db.VarChar(500)
 
   address Address[]
   contact Contact[]

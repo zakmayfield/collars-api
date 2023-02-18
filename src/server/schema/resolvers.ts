@@ -173,8 +173,7 @@ export const resolvers = {
   User: {
     savedPets: async (parent: User, args: {}, context: ServerContext) => {
       const savedPets = await context.prisma.savedPetRecord.findMany({
-        where: { userId: parent.id },
-        select: { pet: true },
+        where: { userId: parent.id }
       });
 
       return savedPets;
@@ -468,11 +467,7 @@ export const resolvers = {
           id: true,
           name: true,
           species: true,
-          breed: {
-            include: {
-              breed: true,
-            },
-          },
+          breed: true
         },
       });
 
@@ -491,22 +486,21 @@ export const resolvers = {
       if (!user)
         return Promise.reject(new GraphQLError(`🚫 Not authenticated`));
 
+      // save pet path
+      // this is creating the SavedPetRecord record but the return is throwing null
       const savePet = await context.prisma.savedPetRecord.create({
         data: {
-          petId,
+          petId: petId,
           userId: user.id,
-        },
-        select: {
-          pet: {
-            include: {},
-          },
-        },
+        }
       });
 
       if (!savePet)
         return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
 
-      return savePet;
+      return await context.prisma.pet.findUnique({
+        where: { id: petId }
+      })
     },
   },
 };
