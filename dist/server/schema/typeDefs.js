@@ -3,10 +3,6 @@ export const typeDefs = /* GraphQL */ `
     getUser: User!
     getBreeds(filterNeedle: String, skip: Int, take: Int): [Breed!]!
     petFeed(filterNeedle: String, skip: Int, take: Int): [Pet]!
-    # linkFeed(filterNeedle: String, take: Int, skip: Int): [Link]!
-    # link(id: Int!): Link
-    # comment(id: Int!): Comment
-    # linkComments(linkId: Int!): Link
   }
 
   type Mutation {
@@ -23,7 +19,7 @@ export const typeDefs = /* GraphQL */ `
     postPet(name: String!, species: Species!): Pet
     deletePet(id: String!): Pet
     addBreedToPet(petId: String!, breedId: String!): Pet
-    saveOrRemoveSavedPet(petId: String!): Pet
+    savePet(petId: String!): Pet
   }
 
   type Address {

@@ -91,12 +91,7 @@ export const resolvers = {
                 include: {
                     breed: true,
                     savedBy: true,
-                    agency: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
+                    agency: true
                 },
             });
             return pets;
@@ -104,57 +99,47 @@ export const resolvers = {
     },
     Pet: {
         breed: async (parent, args, context) => {
-            const breeds = await context.prisma.breedsToPets.findMany({
+            return await context.prisma.breedsToPets.findMany({
                 where: { petId: parent.id },
                 select: { breed: true },
             });
-            return breeds;
         },
         savedBy: async (parent, args, context) => {
-            const savedBy = await context.prisma.savedPetRecord.findMany({
+            return await context.prisma.savedPetRecord.findMany({
                 where: { petId: parent.id },
                 select: { user: true },
             });
-            return savedBy;
         },
+        agency: async (parent, args, context) => {
+            return await context.prisma.user.findUnique({
+                where: { id: parent.agencyId }
+            });
+        }
     },
     User: {
         savedPets: async (parent, args, context) => {
-            const savedPets = await context.prisma.savedPetRecord.findMany({
-                where: { userId: parent.id },
-                select: { pet: true },
+            return await context.prisma.savedPetRecord.findMany({
+                where: { userId: parent.id }
             });
-            return savedPets;
         },
+        profile: async (parent, args, context) => {
+            return await context.prisma.userProfile.findUnique({
+                where: { userId: parent.id }
+            });
+        }
     },
-    // /* Regarding Link & Comment below:
-    //   Link and Comment is pretty sweet - when hitting a query for our Link model we are allowing the client to also query the available comments on the Link, but in a separate query. This means the top level query of Link can succeed but the sub query of comments on the same query can fail, meaning we still have access to the top level of our data { ...link ✅  | comments 🚫 }. This means our UI can support data on multiple levels allowing us to avoid error bubbling and crashing our whole application. For instance a page with several sub tabs, the lowest sub tab can fail on the query but the rest of the data will load fine because the query didn't fail as a whole, only on comments
-    // */
-    // Link: {
-    //   comments: async (parent: Link, args: {}, context: ServerContext) => {
-    //     return await context.prisma.comment.findMany({
-    //       where: { linkId: parent.id },
-    //     });
-    //   },
-    //   postedBy: async (parent: Link, args: {}, context: ServerContext) => {
-    //     return await context.prisma.user.findUnique({
-    //       where: { id: parent.postedById },
-    //     });
-    //   },
-    // },
-    // Comment: {
-    //   link: async (parent: Comment, args: {}, context: ServerContext) => {
-    //     const { linkId } = parent;
-    //     return await context.prisma.link.findUnique({
-    //       where: { id: Number(linkId) },
-    //     });
-    //   },
-    //   postedBy: async (parent: Comment, args: {}, context: ServerContext) => {
-    //     return await context.prisma.user.findUnique({
-    //       where: { id: parent.postedById },
-    //     });
-    //   },
-    // },
+    UserProfile: {
+        address: async (parent, args, context) => {
+            return await context.prisma.address.findMany({
+                where: { userProfileId: parent.id }
+            });
+        },
+        contact: async (parent, args, context) => {
+            return await context.prisma.contact.findMany({
+                where: { userProfileId: parent.id }
+            });
+        }
+    },
     // ::: mutations :::
     Mutation: {
         // ::: User :::
@@ -186,6 +171,11 @@ export const resolvers = {
                     ...args,
                     password: hashedPassword,
                 },
+            });
+            await context.prisma.userProfile.create({
+                data: {
+                    userId: user.id
+                }
             });
             const token = jwt.sign({ userId: user.id }, APP_SECRET);
             return { token, user };
@@ -309,55 +299,31 @@ export const resolvers = {
                     id: true,
                     name: true,
                     species: true,
-                    breed: {
-                        include: {
-                            breed: true,
-                        },
-                    },
+                    breed: true
                 },
             });
             if (!petWithNewBreed)
                 return Promise.reject(new GraphQLError(`🚫 Couldn't locate that pet.`));
             return petWithNewBreed;
         },
-        saveOrRemoveSavedPet: async (parent, args, context) => {
+        savePet: async (parent, args, context) => {
             const { user } = context;
             const { petId } = args;
             if (!user)
                 return Promise.reject(new GraphQLError(`🚫 Not authenticated`));
-            // save or remove if exists
-            // 1.) does user already have this pet saved?
-            // aka does a SavePetRecord exist with userId && petId
-            const savedPetRecordExists = await context.prisma.savedPetRecord.findMany({
-                where: {
-                    petId,
-                    userId: user.id,
-                },
-            });
-            if (savedPetRecordExists) {
-                const deletedSavedPetRecord = await context.prisma.savedPetRecord.delete({
-                    where: {
-                        userId_petId: {
-                            petId,
-                            userId: user.id,
-                        },
-                    },
-                });
-                return deletedSavedPetRecord;
-            }
             // save pet path
+            // this is creating the SavedPetRecord record but the return is throwing null
             const savePet = await context.prisma.savedPetRecord.create({
                 data: {
-                    petId,
+                    petId: petId,
                     userId: user.id,
-                },
-                select: {
-                    pet: true,
-                },
+                }
             });
             if (!savePet)
                 return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
-            return savePet;
+            return await context.prisma.pet.findUnique({
+                where: { id: petId }
+            });
         },
     },
 };

@@ -10,7 +10,7 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
     : '';
 
   if (!token) {
-    Promise.reject(new GraphQLError(`🚫 No Token`));
+    // Promise.reject(new GraphQLError(`🚫 No Token`));
     return null;
   }
   
@@ -35,9 +35,9 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
     },
   });
 
-  // console.log('::: authenticate ::: USER :::', {
-  //   ...user
-  // })
+  console.log('::: authenticate ::: USER :::', {
+    ...user
+  })
 
   return {
     ...user
