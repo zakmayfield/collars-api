@@ -1,14 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-
 export type ServerContext = {
   prisma: PrismaClient;
-  user: SecureUser | null
+  user: SecureUser | null;
 };
+
 export type SecureUser = {
-  id: number;
+  id: string;
   name: string;
   email: string;
+  type: string;
 };
 
 export type ContextProps = {
@@ -16,35 +17,43 @@ export type ContextProps = {
   req: any;
 };
 
-
 export interface SignupArgs {
   name: string;
   email: string;
+  username?: string;
   password: string;
+  type: AccountType;
 }
+
+export enum AccountType {
+  DEFAULT = 'DEFAULT',
+  VOLUNTEER = 'VOLUNTEER',
+  AGENCY = 'AGENCY',
+}
+
 export interface LoginArgs {
   email: string;
   password: string;
 }
+
 export interface DeleteUserAccountArgs {
   password: string;
 }
-
-export interface PostLinkArgs {
-  description: string;
-  url: string;
-}
-export interface UpdateLinkArgs {
-  id: number;
-  description: string;
-  url: string;
+export interface UpdateUserAccountArgs {
+  type?: AccountType
 }
 
-export interface PostCommentArgs {
-  body: string;
-  linkId: number;
+export interface PostPetArgs {
+  name: string;
+  species: Species;
 }
-export interface UpdateCommentArgs {
-  commentId: number;
-  body: string;
+
+export enum Species {
+  CAT = 'CAT',
+  DOG = 'DOG',
+  BIRD = 'BIRD',
+  HORSE = 'HORSE',
+  FISH = 'FISH',
+  REPTILE = 'REPTILE',
+  BARNYARD = 'BARNYARD',
 }

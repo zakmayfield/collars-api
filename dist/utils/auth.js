@@ -1,14 +1,19 @@
+import { GraphQLError } from 'graphql';
 import { verify } from 'jsonwebtoken';
 import { APP_SECRET } from './constants.js';
 export async function authenticateUser(prisma, req) {
     const token = req?.headers?.authorization
         ? req.headers.authorization.split(' ')[1]
         : '';
-    if (!token)
+    if (!token) {
+        Promise.reject(new GraphQLError(`🚫 No Token`));
         return null;
+    }
     const verifiedToken = verify(token, APP_SECRET);
-    if (!verifiedToken)
+    if (!verifiedToken) {
+        Promise.reject(new GraphQLError(`🚫 Invalid Token`));
         return null;
+    }
     // happy path
     const { userId } = verifiedToken;
     const user = await prisma.user.findUnique({
@@ -17,6 +22,7 @@ export async function authenticateUser(prisma, req) {
             id: true,
             name: true,
             email: true,
+            type: true
         },
     });
     console.log('::: authenticate ::: USER :::', {

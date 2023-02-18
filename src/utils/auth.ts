@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { PrismaClient } from '@prisma/client';
 import { JwtPayload, verify } from 'jsonwebtoken';
 
@@ -8,11 +9,18 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
     ? req.headers.authorization.split(' ')[1]
     : '';
 
-  if (!token) return null
-
+  if (!token) {
+    Promise.reject(new GraphQLError(`🚫 No Token`));
+    return null;
+  }
+  
+  
   const verifiedToken = verify(token, APP_SECRET) as JwtPayload;
 
-  if (!verifiedToken) return null
+  if (!verifiedToken) {
+    Promise.reject( new GraphQLError(`🚫 Invalid Token`))
+    return null
+  }
 
   // happy path
   const { userId } = verifiedToken;
@@ -23,12 +31,13 @@ export async function authenticateUser(prisma: PrismaClient, req: any) {
       id: true,
       name: true,
       email: true,
+      type: true
     },
   });
 
-  console.log('::: authenticate ::: USER :::', {
-    ...user
-  })
+  // console.log('::: authenticate ::: USER :::', {
+  //   ...user
+  // })
 
   return {
     ...user

@@ -10,30 +10,230 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Link {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  description String
-  url         String
-  comments    Comment[]
-  postedBy    User?     @relation(fields: [postedById], references: [id])
-  postedById  Int?
+model Address {
+  id String @id @default(uuid())
+
+  address   String  @db.VarChar(100)
+  apartment String? @db.VarChar(25)
+  city      String  @db.VarChar(50)
+  state     String  @db.VarChar(50)
+  zip       Int
+  country   String  @db.VarChar(100)
+
+  userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  userProfileId String? @unique
+  volunteerId   String? @unique
 }
 
-model Comment {
-  id     Int    @id @default(autoincrement())
-  body   String
-  link   Link?  @relation(fields: [linkId], references: [id], onDelete: Cascade)
-  linkId Int?
-  postedBy User? @relation(fields: [postedById], references: [id])
-  postedById  Int?
+model Contact {
+  id String @id @default(uuid())
+
+  phone String? @db.VarChar(50)
+  email String? @db.VarChar(75)
+
+  userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  userProfileId String? @unique
+  volunteerId   String? @unique
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       String         @id @default(uuid())
   name     String
-  email    String @unique
+  email    String       @unique
+  username String?      @unique
   password String
-  links    Link[]
-  comments Comment[]
+  type     AccountType @default(DEFAULT)
+
+  profile UserProfile?
+
+  pets      Pet[]
+  savedPets SavedPetRecord[]
+
+  volunteers Volunteer[]
+}
+
+model Volunteer {
+  id       String     @id @default(uuid())
+  name     String
+  email    String  @unique
+  // allow password to be changed via permissions on the front by either the volunteer themself of the agency who created this volunteer
+  password String
+  phone    String?
+
+  address Address?
+  contact Contact?
+
+  agency   User @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  agencyId String
+}
+
+enum AccountType {
+  DEFAULT
+  VOLUNTEER
+  AGENCY
+}
+
+model UserProfile {
+  id  String     @id @default(uuid())
+  bio String?    @db.VarChar(500)
+
+  address Address[]
+  contact Contact[]
+
+  user   User? @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId String?  @unique
+}
+
+model Pet {
+  id String @id @default(uuid())
+
+  name    String         @db.VarChar(50)
+  species Species
+  breed   BreedsToPets[]
+  savedBy SavedPetRecord[]
+
+  profile PetProfile?
+
+  agency   User? @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  agencyId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SavedPetRecord {
+  user   User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId String
+  pet    Pet  @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petId  String
+
+  @@id([userId, petId])
+}
+
+enum Species {
+  CAT
+  DOG
+  BIRD
+  HORSE
+  FISH
+  REPTILE
+  BARNYARD
+}
+
+model PetProfile {
+  id String @id @default(uuid())
+
+  age      Int?
+  bio      String? @db.VarChar(250)
+  weight   Int?
+  birthday String? @db.VarChar(128)
+
+  isFixed          Boolean?
+  isAdopted        Boolean  @default(false)
+  isAvailable      Boolean  @default(false)
+  isHouseTrained   Boolean?
+  isVaccineCurrent Boolean?
+
+  sex      Sex?      @default(UNKNOWN)
+  coat     Coat?     @default(UNKNOWN)
+  diet     Diet?     @default(STANDARD)
+  color    Color?    @default(UNKNOWN)
+  goodWith GoodWith? @default(UNKNOWN)
+
+  personality Personality? @default(UNKNOWN)
+
+  images ImagesToPetProfiles[]
+
+  pet   Pet? @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petId String? @unique
+}
+
+enum Sex {
+  UNKNOWN
+  FEMALE
+  MALE
+}
+
+enum Color {
+  UNKNOWN
+  BLACK
+  WHITE
+  BROWN
+  GOLDEN
+  SPOTTED
+  BRINDLE
+}
+
+enum Personality {
+  UNKNOWN
+  ACTIVE
+  CURIOUS
+  GOOFY
+  HYPER
+  LAZY
+  LONER
+}
+
+enum Diet {
+  STANDARD
+  MEDICAL
+  WEIGHT
+}
+
+enum Coat {
+  UNKNOWN
+  SHORT
+  MEDIUM
+  LONG
+  NONE
+}
+
+enum GoodWith {
+  UNKNOWN
+  CATS
+  DOGS
+  CHILDREN
+  CATS_AND_DOGS
+  ALL
+}
+
+model Breed {
+  id String @id @default(uuid())
+
+  breed   String
+  species Species
+
+  pets BreedsToPets[]
+}
+
+model BreedsToPets {
+  breed   Breed @relation(fields: [breedId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  breedId String
+  pet     Pet   @relation(fields: [petId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petId   String
+
+  @@id([breedId, petId])
+}
+
+model Image {
+  id String @id @default(uuid())
+
+  url       String?
+  file      String?
+  thumbnail String?
+
+  pets ImagesToPetProfiles[]
+}
+
+model ImagesToPetProfiles {
+  image        Image      @relation(fields: [imageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  imageId      String
+  petProfile   PetProfile @relation(fields: [petProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  petProfileId String
+
+  @@id([imageId, petProfileId])
 }
