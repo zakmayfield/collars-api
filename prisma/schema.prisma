@@ -23,8 +23,8 @@ model Address {
   userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  volunteerId   String? @unique
   userProfileId String? @unique
+  volunteerId   String? @unique
 }
 
 model Contact {
@@ -34,8 +34,10 @@ model Contact {
   email String? @db.VarChar(75)
 
   userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   userProfileId String? @unique
+  volunteerId   String? @unique
 }
 
 model User {
@@ -63,6 +65,7 @@ model Volunteer {
   phone    String?
 
   address Address?
+  contact Contact?
 
   agency   User @relation(fields: [agencyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   agencyId String

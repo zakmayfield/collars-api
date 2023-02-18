@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// import { Link, Comment } from '@prisma/client';
+// import { Link, Comment, UserProfile } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/index.js';
 
 import {
@@ -20,7 +20,7 @@ import {
   applySkipConstraints,
   APP_SECRET,
 } from '../../utils/index.js';
-import { Pet, Species, User } from '@prisma/client';
+import { Pet, Species, User, UserProfile } from '@prisma/client';
 
 export const resolvers = {
   // ::: query :::
@@ -68,7 +68,6 @@ export const resolvers = {
 
       return breeds;
     },
-
     // ::: User :::
     getUser: async (parent: unknown, args: {}, context: ServerContext) => {
       const { user } = context;
@@ -97,9 +96,7 @@ export const resolvers = {
 
       return userData;
     },
-
     // ::: Pet :::
-
     petFeed: async (
       // public
       parent: unknown,
@@ -137,12 +134,7 @@ export const resolvers = {
         include: {
           breed: true,
           savedBy: true,
-          agency: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
+          agency: true
         },
       });
 
@@ -152,66 +144,53 @@ export const resolvers = {
 
   Pet: {
     breed: async (parent: Pet, args: {}, context: ServerContext) => {
-      const breeds = await context.prisma.breedsToPets.findMany({
+      return await context.prisma.breedsToPets.findMany({
         where: { petId: parent.id },
         select: { breed: true },
       });
-
-      return breeds;
     },
 
     savedBy: async (parent: Pet, args: {}, context: ServerContext) => {
-      const savedBy = await context.prisma.savedPetRecord.findMany({
+      return await context.prisma.savedPetRecord.findMany({
         where: { petId: parent.id },
         select: { user: true },
       });
-
-      return savedBy;
     },
+
+    agency: async (parent: Pet, args: {}, context: ServerContext) => {
+      return await context.prisma.user.findUnique({
+        where: { id: parent.agencyId }
+      })
+    }
   },
 
   User: {
     savedPets: async (parent: User, args: {}, context: ServerContext) => {
-      const savedPets = await context.prisma.savedPetRecord.findMany({
+      return await context.prisma.savedPetRecord.findMany({
         where: { userId: parent.id }
       });
-
-      return savedPets;
     },
+
+    profile: async  (parent: User, args: {}, context: ServerContext) => {
+      return await context.prisma.userProfile.findUnique({
+        where: { userId: parent.id}
+      })
+    }
   },
 
-  // /* Regarding Link & Comment below:
-  //   Link and Comment is pretty sweet - when hitting a query for our Link model we are allowing the client to also query the available comments on the Link, but in a separate query. This means the top level query of Link can succeed but the sub query of comments on the same query can fail, meaning we still have access to the top level of our data { ...link ✅  | comments 🚫 }. This means our UI can support data on multiple levels allowing us to avoid error bubbling and crashing our whole application. For instance a page with several sub tabs, the lowest sub tab can fail on the query but the rest of the data will load fine because the query didn't fail as a whole, only on comments
-  // */
-  // Link: {
-  //   comments: async (parent: Link, args: {}, context: ServerContext) => {
-  //     return await context.prisma.comment.findMany({
-  //       where: { linkId: parent.id },
-  //     });
-  //   },
+  UserProfile: {
+    address:  async  (parent: UserProfile, args: {}, context: ServerContext) => {
+      return await context.prisma.address.findMany({
+        where: { userProfileId: parent.id }
+      })
+    },
 
-  //   postedBy: async (parent: Link, args: {}, context: ServerContext) => {
-  //     return await context.prisma.user.findUnique({
-  //       where: { id: parent.postedById },
-  //     });
-  //   },
-  // },
-
-  // Comment: {
-  //   link: async (parent: Comment, args: {}, context: ServerContext) => {
-  //     const { linkId } = parent;
-
-  //     return await context.prisma.link.findUnique({
-  //       where: { id: Number(linkId) },
-  //     });
-  //   },
-
-  //   postedBy: async (parent: Comment, args: {}, context: ServerContext) => {
-  //     return await context.prisma.user.findUnique({
-  //       where: { id: parent.postedById },
-  //     });
-  //   },
-  // },
+    contact:  async  (parent: UserProfile, args: {}, context: ServerContext) => {
+      return await context.prisma.contact.findMany({
+        where: { userProfileId: parent.id }
+      })
+    }
+  },
 
   // ::: mutations :::
   Mutation: {
@@ -261,6 +240,12 @@ export const resolvers = {
           password: hashedPassword,
         },
       });
+
+      await context.prisma.userProfile.create({
+        data: {
+          userId: user.id
+        }
+      })
 
       const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
