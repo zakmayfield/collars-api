@@ -6,7 +6,7 @@ export async function authenticateUser(prisma, req) {
         ? req.headers.authorization.split(' ')[1]
         : '';
     if (!token) {
-        Promise.reject(new GraphQLError(`🚫 No Token`));
+        // Promise.reject(new GraphQLError(`🚫 No Token`));
         return null;
     }
     const verifiedToken = verify(token, APP_SECRET);
@@ -25,9 +25,9 @@ export async function authenticateUser(prisma, req) {
             type: true
         },
     });
-    // console.log('::: authenticate ::: USER :::', {
-    //   ...user
-    // })
+    console.log('::: authenticate ::: USER :::', {
+        ...user
+    });
     return {
         ...user
     };

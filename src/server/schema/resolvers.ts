@@ -18,6 +18,7 @@ import {
 import {
   applyTakeConstraints,
   applySkipConstraints,
+  generateToken,
   APP_SECRET,
 } from '../../utils/index.js';
 import { Pet, Species, User, UserProfile } from '@prisma/client';
@@ -66,6 +67,7 @@ export const resolvers = {
         select: {
           id: true,
           name: true,
+          username: true,
           email: true,
           type: true,
           profile: true,
@@ -160,15 +162,16 @@ export const resolvers = {
       const petIds = savedPets.map((savedPet) => savedPet.petId);
 
       const saved = await context.prisma.savedPetRecord.findMany({
-        where: { 
-          petId: { in: petIds }, 
-          userId: parent.id 
-        }, select: {
-          pet: true
+        where: {
+          petId: { in: petIds },
+          userId: parent.id,
+        },
+        select: {
+          pet: true,
         },
       });
 
-      return saved
+      return saved;
     },
 
     profile: async (parent: User, args: {}, context: ServerContext) => {
@@ -194,6 +197,12 @@ export const resolvers = {
 
   // ::: mutations :::
   Mutation: {
+    
+    // Regarding client fetchPolicy
+
+    // Ensure that the requests being made on `login` & `signUp` are using a `network-only` fetchPolicy on the client side
+    // we need to be secure with our data since we are passing sensitive data, like an email, through an HTTP request which is easily intercepted and viewed, exposing client data is a security risk.
+    
     // ::: User :::
     signUp: async (
       parent: unknown,
@@ -247,7 +256,7 @@ export const resolvers = {
         },
       });
 
-      const token = jwt.sign({ userId: user.id }, APP_SECRET);
+      const token = generateToken(user.id)
 
       return { token, user };
     },
@@ -273,7 +282,7 @@ export const resolvers = {
       }
 
       // generate a token
-      const token = jwt.sign({ userId: user.id }, APP_SECRET);
+      const token = generateToken(user.id);
 
       return { user, token };
     },
@@ -331,14 +340,29 @@ export const resolvers = {
           new GraphQLError(`🚫 Please login to perform this action.`)
         );
 
-      const { type } = args;
+      const { type, name, username } = args;
 
-      const updatedUser = await context.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          ...args,
-        },
-      });
+      const data: UpdateUserAccountArgs = {
+        ...(type && { type }),
+        ...(name && { name }),
+        ...(username && { username }),
+      };
+
+      const updatedUser = await context.prisma.user
+        .update({
+          where: { id: user.id },
+          data,
+        })
+        .catch((err) => {
+          if (
+            // verify error is a unique constraint error
+            err.code === 'P2002' &&
+            err instanceof PrismaClientKnownRequestError
+          )
+            return Promise.reject(
+              new GraphQLError(`🚫 Username is already taken, try another one.`)
+            );
+        });
 
       return updatedUser;
     },

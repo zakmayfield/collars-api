@@ -18,20 +18,8 @@ export const resolvers = {
                     ],
                 }
                 : {};
-            const take = applyTakeConstraints({
-                min: 1,
-                max: 50,
-                value: args.take ?? 30,
-            });
-            const skip = applySkipConstraints({
-                min: 0,
-                max: 50,
-                value: args.skip ?? 0,
-            });
             const breeds = context.prisma.breed.findMany({
                 where,
-                skip,
-                take,
             });
             if (!breeds)
                 return Promise.reject(new GraphQLError(`🚫 Server error, couldn't locate breeds.`));
@@ -91,7 +79,7 @@ export const resolvers = {
                 include: {
                     breed: true,
                     savedBy: true,
-                    agency: true
+                    agency: true,
                 },
             });
             return pets;
@@ -112,33 +100,44 @@ export const resolvers = {
         },
         agency: async (parent, args, context) => {
             return await context.prisma.user.findUnique({
-                where: { id: parent.agencyId }
+                where: { id: parent.agencyId },
             });
-        }
+        },
     },
     User: {
         savedPets: async (parent, args, context) => {
-            return await context.prisma.savedPetRecord.findMany({
-                where: { userId: parent.id }
+            const savedPets = await context.prisma.savedPetRecord.findMany({
+                where: { userId: parent.id },
+                select: { petId: true },
             });
+            const petIds = savedPets.map((savedPet) => savedPet.petId);
+            const saved = await context.prisma.savedPetRecord.findMany({
+                where: {
+                    petId: { in: petIds },
+                    userId: parent.id
+                }, select: {
+                    pet: true
+                },
+            });
+            return saved;
         },
         profile: async (parent, args, context) => {
             return await context.prisma.userProfile.findUnique({
-                where: { userId: parent.id }
+                where: { userId: parent.id },
             });
-        }
+        },
     },
     UserProfile: {
         address: async (parent, args, context) => {
             return await context.prisma.address.findMany({
-                where: { userProfileId: parent.id }
+                where: { userProfileId: parent.id },
             });
         },
         contact: async (parent, args, context) => {
             return await context.prisma.contact.findMany({
-                where: { userProfileId: parent.id }
+                where: { userProfileId: parent.id },
             });
-        }
+        },
     },
     // ::: mutations :::
     Mutation: {
@@ -174,8 +173,8 @@ export const resolvers = {
             });
             await context.prisma.userProfile.create({
                 data: {
-                    userId: user.id
-                }
+                    userId: user.id,
+                },
             });
             const token = jwt.sign({ userId: user.id }, APP_SECRET);
             return { token, user };
@@ -254,6 +253,11 @@ export const resolvers = {
                     agencyId: user.id,
                 },
             });
+            await context.prisma.petProfile.create({
+                data: {
+                    petId: newPet.id,
+                },
+            });
             return newPet;
         },
         deletePet: async (parent, args, context) => {
@@ -299,7 +303,7 @@ export const resolvers = {
                     id: true,
                     name: true,
                     species: true,
-                    breed: true
+                    breed: true,
                 },
             });
             if (!petWithNewBreed)
@@ -317,12 +321,12 @@ export const resolvers = {
                 data: {
                     petId: petId,
                     userId: user.id,
-                }
+                },
             });
             if (!savePet)
                 return Promise.reject(new GraphQLError(`🚫 Server Error ::: savePet`));
             return await context.prisma.pet.findUnique({
-                where: { id: petId }
+                where: { id: petId },
             });
         },
     },

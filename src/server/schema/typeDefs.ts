@@ -15,7 +15,7 @@ export const typeDefs = /* GraphQL */ `
     ): AuthPayload
     login(email: String!, password: String!): AuthPayload
     deleteUserAccount(password: String!): User
-    updateUserAccount(type: String): User
+    updateUserAccount(type: String, name: String, username: String): User
     postPet(name: String!, species: Species!): Pet
     deletePet(id: String!): Pet
     addBreedToPet(petId: String!, breedId: String!): Pet

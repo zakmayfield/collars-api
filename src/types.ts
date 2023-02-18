@@ -8,6 +8,7 @@ export type ServerContext = {
 export type SecureUser = {
   id: string;
   name: string;
+  username?: string;
   email: string;
   type: string;
 };
@@ -40,7 +41,9 @@ export interface DeleteUserAccountArgs {
   password: string;
 }
 export interface UpdateUserAccountArgs {
-  type?: AccountType
+  type?: AccountType;
+  name?: string;
+  username?: string;
 }
 
 export interface PostPetArgs {

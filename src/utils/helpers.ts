@@ -1,4 +1,6 @@
 import { GraphQLError } from 'graphql';
+import { APP_SECRET } from './constants.js';
+import jwt from 'jsonwebtoken';
 
 export const applyTakeConstraints = (params: {
   min: number;
@@ -26,4 +28,10 @@ export const applySkipConstraints = (params: {
   }
 
   return params.value;
+};
+
+export const generateToken = (
+    userId: string
+  ) => {
+  return jwt.sign({ userId }, APP_SECRET, { expiresIn: '24h' });
 };
