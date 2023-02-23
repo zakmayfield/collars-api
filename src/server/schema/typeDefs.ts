@@ -1,3 +1,4 @@
+import { Species } from '@prisma/client';
 export const typeDefs = /* GraphQL */ `
   type Query {
     getUser: User!
@@ -16,7 +17,8 @@ export const typeDefs = /* GraphQL */ `
     login(email: String!, password: String!): AuthPayload
     deleteUserAccount(password: String!): User
     updateUserAccount(type: String, name: String, username: String): User
-    postPet(name: String!, species: Species!): Pet
+    postPet(name: String!, species: Species!, location: String): Pet
+    updatePet(id: String!, name: String, species: Species, location: String): Pet
     deletePet(id: String!): Pet
     addBreedToPet(petId: String!, breedId: String!): Pet
     savePet(petId: String!): Pet
@@ -99,6 +101,7 @@ export const typeDefs = /* GraphQL */ `
     id: String!
     name: String!
     species: Species!
+    location: String
     breed: [BreedsToPets]
     savedBy: [UsersToPets]
     profile: PetProfile

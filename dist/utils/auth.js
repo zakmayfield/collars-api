@@ -21,12 +21,10 @@ export async function authenticateUser(prisma, req) {
         select: {
             id: true,
             name: true,
+            username: true,
             email: true,
             type: true
         },
-    });
-    console.log('::: authenticate ::: USER :::', {
-        ...user
     });
     return {
         ...user

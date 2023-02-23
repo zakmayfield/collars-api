@@ -86,9 +86,8 @@ CREATE TABLE "Pet" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
     "species" "Species" NOT NULL,
+    "location" TEXT,
     "agencyId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Pet_pkey" PRIMARY KEY ("id")
 );

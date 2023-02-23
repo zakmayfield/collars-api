@@ -28,11 +28,18 @@ const server = new ApolloServer<ServerContext>({
 await server.start();
 
 app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
+
+app.use(
   `/`,
   cors<cors.CorsRequest>(),
   bodyParser.json(),
   expressMiddleware(server, {
-    context: async ({ req }) => await createContext(prisma, req),
+    context: async ({ req, res }) => await createContext(prisma, req, res),
   })
 );
 

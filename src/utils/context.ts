@@ -4,10 +4,11 @@ import { authenticateUser } from './auth.js';
 
 export async function createContext(
   prisma: PrismaClient,
-  req: any
+  req: any,
+  res: any
 ): Promise<ServerContext> {
   return {
     prisma,
-    user: await authenticateUser(prisma, req),
+    user: await authenticateUser(prisma, req, res),
   };
 }

@@ -1,7 +1,8 @@
 import { GraphQLError } from 'graphql';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { applyTakeConstraints, applySkipConstraints, APP_SECRET, } from '../../utils/index.js';
+// import { Link, Comment, UserProfile } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/index.js';
+import { applyTakeConstraints, applySkipConstraints, generateToken, } from '../../utils/index.js';
 export const resolvers = {
     // ::: query :::
     Query: {
@@ -35,6 +36,7 @@ export const resolvers = {
                 select: {
                     id: true,
                     name: true,
+                    username: true,
                     email: true,
                     type: true,
                     profile: true,
@@ -114,9 +116,10 @@ export const resolvers = {
             const saved = await context.prisma.savedPetRecord.findMany({
                 where: {
                     petId: { in: petIds },
-                    userId: parent.id
-                }, select: {
-                    pet: true
+                    userId: parent.id,
+                },
+                select: {
+                    pet: true,
                 },
             });
             return saved;
@@ -141,6 +144,9 @@ export const resolvers = {
     },
     // ::: mutations :::
     Mutation: {
+        // Regarding client fetchPolicy
+        // Ensure that the requests being made on `login` & `signUp` are using a `network-only` fetchPolicy on the client side
+        // we need to be secure with our data since we are passing sensitive data, like an email, through an HTTP request which is easily intercepted and viewed, exposing client data is a security risk.
         // ::: User :::
         signUp: async (parent, args, context) => {
             // validate args // throw if incomplete data
@@ -176,7 +182,7 @@ export const resolvers = {
                     userId: user.id,
                 },
             });
-            const token = jwt.sign({ userId: user.id }, APP_SECRET);
+            const token = generateToken(user.id);
             return { token, user };
         },
         login: async (parent, args, context) => {
@@ -196,7 +202,7 @@ export const resolvers = {
                 return Promise.reject(new GraphQLError(`🚫 Incorrect credentials.`));
             }
             // generate a token
-            const token = jwt.sign({ userId: user.id }, APP_SECRET);
+            const token = generateToken(user.id);
             return { user, token };
         },
         deleteUserAccount: async (parent, args, context) => {
@@ -227,12 +233,22 @@ export const resolvers = {
             const { user } = context;
             if (!user)
                 return Promise.reject(new GraphQLError(`🚫 Please login to perform this action.`));
-            const { type } = args;
-            const updatedUser = await context.prisma.user.update({
+            const { type, name, username } = args;
+            const updatedUser = await context.prisma.user
+                .update({
                 where: { id: user.id },
                 data: {
-                    ...args,
+                    ...(type && { type }),
+                    ...(name && { name }),
+                    ...(username && { username }),
                 },
+            })
+                .catch((err) => {
+                if (
+                // verify error is a unique constraint error
+                err.code === 'P2002' &&
+                    err instanceof PrismaClientKnownRequestError)
+                    return Promise.reject(new GraphQLError(`🚫 Username is already taken, try another one.`));
             });
             return updatedUser;
         },
@@ -243,13 +259,14 @@ export const resolvers = {
                 return Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
             if (user.type !== 'AGENCY')
                 return Promise.reject(new GraphQLError(`🚫 This user does not have the proper authorization to do this.`));
-            const { name, species } = args;
+            const { name, species, location } = args;
             if (!name || !species)
                 return Promise.reject(new GraphQLError(`🚫 Name and species are required fields when creating a pet.`));
             const newPet = await context.prisma.pet.create({
                 data: {
                     name,
                     species,
+                    ...(location && { location }),
                     agencyId: user.id,
                 },
             });
@@ -259,6 +276,26 @@ export const resolvers = {
                 },
             });
             return newPet;
+        },
+        updatePet: async (parent, args, context) => {
+            const { user } = context;
+            const { id, name, species, location } = args;
+            if (!user)
+                return Promise.reject(new GraphQLError(`🚫 User is not authenticated. Please log in.`));
+            const petToUpdate = await context.prisma.pet.findUnique({
+                where: { id },
+            });
+            if (petToUpdate.agencyId !== user.id)
+                return Promise.reject(new GraphQLError(`🚫 User: ${user.id} does not have permission to delete pet with id: ${petToUpdate.id}`));
+            const updatedPet = await context.prisma.pet.update({
+                where: { id },
+                data: {
+                    ...(name && { name }),
+                    ...(species && { species }),
+                    ...(location && { location }),
+                },
+            });
+            return updatedPet;
         },
         deletePet: async (parent, args, context) => {
             const { user } = context;

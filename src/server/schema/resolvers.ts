@@ -12,6 +12,7 @@ import {
   LoginArgs,
   DeleteUserAccountArgs,
   UpdateUserAccountArgs,
+  UpdatePetArgs,
   PostPetArgs,
 } from '../../types.js';
 
@@ -197,12 +198,11 @@ export const resolvers = {
 
   // ::: mutations :::
   Mutation: {
-    
     // Regarding client fetchPolicy
 
     // Ensure that the requests being made on `login` & `signUp` are using a `network-only` fetchPolicy on the client side
     // we need to be secure with our data since we are passing sensitive data, like an email, through an HTTP request which is easily intercepted and viewed, exposing client data is a security risk.
-    
+
     // ::: User :::
     signUp: async (
       parent: unknown,
@@ -256,7 +256,7 @@ export const resolvers = {
         },
       });
 
-      const token = generateToken(user.id)
+      const token = generateToken(user.id);
 
       return { token, user };
     },
@@ -342,16 +342,14 @@ export const resolvers = {
 
       const { type, name, username } = args;
 
-      const data: UpdateUserAccountArgs = {
-        ...(type && { type }),
-        ...(name && { name }),
-        ...(username && { username }),
-      };
-
       const updatedUser = await context.prisma.user
         .update({
           where: { id: user.id },
-          data,
+          data: {
+            ...(type && { type }),
+            ...(name && { name }),
+            ...(username && { username }),
+          },
         })
         .catch((err) => {
           if (
@@ -386,7 +384,7 @@ export const resolvers = {
           )
         );
 
-      const { name, species } = args;
+      const { name, species, location } = args;
 
       if (!name || !species)
         return Promise.reject(
@@ -399,6 +397,7 @@ export const resolvers = {
         data: {
           name,
           species,
+          ...(location && { location }),
           agencyId: user.id,
         },
       });
@@ -410,6 +409,40 @@ export const resolvers = {
       });
 
       return newPet;
+    },
+    updatePet: async (
+      parent: unknown,
+      args: UpdatePetArgs,
+      context: ServerContext
+    ) => {
+      const { user } = context;
+      const { id, name, species, location } = args;
+      if (!user)
+        return Promise.reject(
+          new GraphQLError(`🚫 User is not authenticated. Please log in.`)
+        );
+
+      const petToUpdate = await context.prisma.pet.findUnique({
+        where: { id },
+      });
+
+      if (petToUpdate.agencyId !== user.id)
+        return Promise.reject(
+          new GraphQLError(
+            `🚫 User: ${user.id} does not have permission to delete pet with id: ${petToUpdate.id}`
+          )
+        );
+
+      const updatedPet = await context.prisma.pet.update({
+        where: { id },
+        data: {
+          ...(name && { name }),
+          ...(species && { species }),
+          ...(location && { location }),
+        },
+      });
+
+      return updatedPet;
     },
     deletePet: async (
       parent: unknown,

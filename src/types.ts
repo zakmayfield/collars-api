@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 export type ServerContext = {
   prisma: PrismaClient;
   user: SecureUser | null;
+  res?: any
 };
 
 export type SecureUser = {
@@ -49,6 +50,15 @@ export interface UpdateUserAccountArgs {
 export interface PostPetArgs {
   name: string;
   species: Species;
+  location?: string;
+  agencyId: string;
+}
+
+export interface UpdatePetArgs {
+  id: string;
+  name?: string;
+  species?: Species;
+  location?: string;
 }
 
 export enum Species {
